@@ -1,0 +1,180 @@
+/*
+ * Design tokens — Suite RH
+ * Tokens semânticos consumidos pelos componentes. Nenhuma cor literal
+ * (hex/rgb/hsl) deve ser usada fora deste arquivo.
+ *
+ * Padrão: cada token de cor é declarado como `--c-*` em :root (tema claro,
+ * padrão) e sobrescrito em [data-theme="dark"]. O bloco @theme apenas
+ * aponta os tokens Tailwind (--color-*) para essas variáveis, permitindo
+ * que utilitários como bg-surface / text-foreground funcionem nos dois
+ * temas sem duplicar componentes.
+ */
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Cores semânticas (ver definição de valores abaixo) */
+    --color-background: var(--c-background);
+    --color-background-subtle: var(--c-background-subtle);
+    --color-surface: var(--c-surface);
+    --color-surface-raised: var(--c-surface-raised);
+    --color-surface-hover: var(--c-surface-hover);
+    --color-surface-active: var(--c-surface-active);
+
+    --color-foreground: var(--c-foreground);
+    --color-foreground-muted: var(--c-foreground-muted);
+    --color-foreground-subtle: var(--c-foreground-subtle);
+
+    --color-border: var(--c-border);
+    --color-border-strong: var(--c-border-strong);
+
+    --color-primary: var(--c-primary);
+    --color-primary-hover: var(--c-primary-hover);
+    --color-primary-active: var(--c-primary-active);
+    --color-primary-foreground: var(--c-primary-foreground);
+
+    --color-success: var(--c-success);
+    --color-success-background: var(--c-success-background);
+    --color-warning: var(--c-warning);
+    --color-warning-background: var(--c-warning-background);
+    --color-danger: var(--c-danger);
+    --color-danger-background: var(--c-danger-background);
+    --color-info: var(--c-info);
+    --color-info-background: var(--c-info-background);
+
+    --color-focus-ring: var(--c-focus-ring);
+    --color-overlay: var(--c-overlay);
+
+    /* Raio */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    /* Sombras — sempre sutis, nunca coloridas/fortes */
+    --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.04);
+    --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+    --shadow-md: 0 4px 10px rgb(15 23 42 / 0.06), 0 2px 4px rgb(15 23 42 / 0.04);
+    --shadow-lg: 0 12px 24px rgb(15 23 42 / 0.08);
+
+    /* Larguras/alturas estruturais */
+    --container-width: 80rem;
+    --sidebar-width: 17rem;
+    --sidebar-width-collapsed: 4.5rem;
+    --header-height: 3.75rem;
+
+    /* Tipografia fluida */
+    --text-display: clamp(1.625rem, 1.1rem + 1.6vw, 2.25rem);
+    --text-page-title: clamp(1.375rem, 1.1rem + 0.8vw, 1.75rem);
+    --text-section-title: clamp(1.05rem, 1rem + 0.2vw, 1.15rem);
+
+    /* Duração/curva de animação */
+    --duration-fast: 120ms;
+    --duration-base: 180ms;
+    --duration-slow: 260ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
+}
+
+/* Camadas de z-index nomeadas (usadas via classes utilitárias abaixo) */
+:root {
+    --z-sticky: 20;
+    --z-dropdown: 30;
+    --z-drawer: 40;
+    --z-overlay: 45;
+    --z-modal: 50;
+    --z-toast: 60;
+}
+
+@utility z-sticky { z-index: var(--z-sticky); }
+@utility z-dropdown { z-index: var(--z-dropdown); }
+@utility z-drawer { z-index: var(--z-drawer); }
+@utility z-overlay { z-index: var(--z-overlay); }
+@utility z-modal { z-index: var(--z-modal); }
+@utility z-toast { z-index: var(--z-toast); }
+
+/* ---------------------------------------------------------------- */
+/* TEMA CLARO (padrão)                                              */
+/* ---------------------------------------------------------------- */
+:root,
+[data-theme="light"] {
+    color-scheme: light;
+
+    --c-background: #f4f5f7;
+    --c-background-subtle: #eceef1;
+    --c-surface: #ffffff;
+    --c-surface-raised: #ffffff;
+    --c-surface-hover: #f4f5f7;
+    --c-surface-active: #e9ebef;
+
+    --c-foreground: #14171f;
+    --c-foreground-muted: #5b6472;
+    --c-foreground-subtle: #8a93a3;
+
+    --c-border: #e2e4e9;
+    --c-border-strong: #cbcfd8;
+
+    --c-primary: #4338ca;
+    --c-primary-hover: #372da4;
+    --c-primary-active: #2f2586;
+    --c-primary-foreground: #ffffff;
+
+    --c-success: #15803d;
+    --c-success-background: #edf9f0;
+    --c-warning: #b45309;
+    --c-warning-background: #fef7ec;
+    --c-danger: #b91c1c;
+    --c-danger-background: #fdecec;
+    --c-info: #0369a1;
+    --c-info-background: #eaf6fc;
+
+    --c-focus-ring: #4338ca;
+    --c-overlay: rgb(15 23 42 / 0.45);
+}
+
+/* ---------------------------------------------------------------- */
+/* TEMA ESCURO — projetado, não invertido                           */
+/* ---------------------------------------------------------------- */
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --c-background: #121317;
+    --c-background-subtle: #0e0f12;
+    --c-surface: #1a1c21;
+    --c-surface-raised: #202228;
+    --c-surface-hover: #24262d;
+    --c-surface-active: #2b2e36;
+
+    --c-foreground: #e8e9ec;
+    --c-foreground-muted: #a2a7b3;
+    --c-foreground-subtle: #6d7280;
+
+    --c-border: #2a2c33;
+    --c-border-strong: #3a3d47;
+
+    --c-primary: #7c6df2;
+    --c-primary-hover: #8f83f5;
+    --c-primary-active: #a297f7;
+    --c-primary-foreground: #14171f;
+
+    --c-success: #4ade80;
+    --c-success-background: rgb(74 222 128 / 0.12);
+    --c-warning: #fbbf24;
+    --c-warning-background: rgb(251 191 36 / 0.12);
+    --c-danger: #f87171;
+    --c-danger-background: rgb(248 113 113 / 0.12);
+    --c-info: #38bdf8;
+    --c-info-background: rgb(56 189 248 / 0.12);
+
+    --c-focus-ring: #8f83f5;
+    --c-overlay: rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}

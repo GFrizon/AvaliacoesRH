@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Ícone-fonte da Suite RH — Avaliações.
+    Símbolo: prancheta de avaliação com marca de "check" e indicador de
+    pessoa, transmitindo checklist + desempenho + RH sem depender de texto.
+    Mantido vetorial (fonte única) — todos os PNGs derivam deste arquivo.
+    Margem interna generosa (~64px em 512) para funcionar como ícone
+    maskable/circular sem cortar o símbolo.
+  -->
+  <rect width="512" height="512" rx="96" fill="#4338ca" />
+
+  <!-- Prancheta -->
+  <rect x="146" y="118" width="220" height="288" rx="24" fill="#ffffff" />
+  <rect x="146" y="118" width="220" height="288" rx="24" fill="none" stroke="#4338ca" stroke-opacity="0.08" stroke-width="2" />
+
+  <!-- Clip no topo da prancheta -->
+  <rect x="216" y="100" width="80" height="34" rx="12" fill="#4338ca" />
+
+  <!-- Linhas de conteúdo (representando itens avaliados) -->
+  <rect x="178" y="196" width="120" height="14" rx="7" fill="#c7d2fe" />
+  <rect x="178" y="230" width="90" height="14" rx="7" fill="#c7d2fe" />
+
+  <!-- Marca de check em destaque (resultado da avaliação) -->
+  <circle cx="256" cy="316" r="54" fill="#4338ca" />
+  <path d="M232 316 L250 334 L284 296" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

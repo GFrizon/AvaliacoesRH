@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Variante "maskable" do ícone — fundo em sangria total (sem cantos
+    arredondados próprios), já que o sistema operacional aplica sua
+    própria máscara (círculo, squircle, etc.). O símbolo permanece
+    dentro da zona segura central (~80% do canvas).
+  -->
+  <rect width="512" height="512" fill="#4338ca" />
+
+  <rect x="146" y="118" width="220" height="288" rx="24" fill="#ffffff" />
+  <rect x="216" y="100" width="80" height="34" rx="12" fill="#4338ca" />
+  <rect x="178" y="196" width="120" height="14" rx="7" fill="#c7d2fe" />
+  <rect x="178" y="230" width="90" height="14" rx="7" fill="#c7d2fe" />
+  <circle cx="256" cy="316" r="54" fill="#4338ca" />
+  <path d="M232 316 L250 334 L284 296" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
