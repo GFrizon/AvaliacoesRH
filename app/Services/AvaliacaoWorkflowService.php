@@ -7,9 +7,11 @@ use App\Enums\AvaliacaoStatus;
 use App\Enums\UserRole;
 use App\Mail\AvaliacaoConcluidaMail;
 use App\Mail\AvaliacaoPendenteMail;
+use App\Mail\AvaliacoesAgendadasMail;
 use App\Models\Avaliacao;
 use App\Models\Colaborador;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
@@ -39,8 +41,10 @@ class AvaliacaoWorkflowService
                 'gestor_id' => $colaborador->gestor_id,
             ]);
 
+        $criadas = new Collection();
+
         foreach (AvaliacaoCiclo::cases() as $ciclo) {
-            Avaliacao::firstOrCreate(
+            $avaliacao = Avaliacao::firstOrCreate(
                 [
                     'colaborador_id' => $colaborador->id,
                     'formulario_id' => $colaborador->formulario_id,
@@ -54,7 +58,26 @@ class AvaliacaoWorkflowService
                     'data_limite' => $this->dataLimite($colaborador, $ciclo),
                 ],
             );
+
+            if ($avaliacao->wasRecentlyCreated) {
+                $criadas->push($avaliacao);
+            }
         }
+
+        $this->notificarGestorAvaliacoesAgendadas($colaborador, $criadas);
+    }
+
+    public function notificarGestorAvaliacoesAgendadas(Colaborador $colaborador, Collection $avaliacoes): bool
+    {
+        $colaborador->loadMissing(['gestor', 'setor']);
+
+        if ($avaliacoes->isEmpty() || ! $colaborador->gestor?->email) {
+            return false;
+        }
+
+        Mail::to($colaborador->gestor->email)->queue(new AvaliacoesAgendadasMail($colaborador, $avaliacoes));
+
+        return true;
     }
 
     public function enviarPendentesVencidas(): int

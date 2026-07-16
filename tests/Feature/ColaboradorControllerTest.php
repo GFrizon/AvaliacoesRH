@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\AvaliacaoStatus;
 use App\Enums\FormularioTipo;
 use App\Enums\UserRole;
+use App\Mail\AvaliacoesAgendadasMail;
 use App\Models\Avaliacao;
 use App\Models\Colaborador;
 use App\Models\Empresa;
@@ -13,6 +14,7 @@ use App\Models\Setor;
 use App\Models\UnidadeNegocio;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class ColaboradorControllerTest extends TestCase
@@ -55,6 +57,8 @@ class ColaboradorControllerTest extends TestCase
 
     public function test_rh_can_create_colaborador(): void
     {
+        Mail::fake();
+
         $empresa = Empresa::create(['nome' => 'Empresa Demo']);
         $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'Operacoes']);
         UnidadeNegocio::create(['empresa_id' => $empresa->id, 'nome' => 'Bakof Tec']);
@@ -101,5 +105,6 @@ class ColaboradorControllerTest extends TestCase
         ]);
         $this->assertSame(3, Avaliacao::count());
         $this->assertSame(3, Avaliacao::where('status', AvaliacaoStatus::Agendada)->count());
+        Mail::assertQueued(AvaliacoesAgendadasMail::class, fn ($mail) => $mail->hasTo($gestor->email));
     }
 }
