@@ -316,6 +316,24 @@ body {
     background: var(--color-surface-hover);
 }
 
+.evaluation-group-row-success {
+    background: color-mix(in srgb, var(--color-success-background) 46%, var(--color-surface));
+    box-shadow: inset 4px 0 0 var(--color-success);
+}
+
+.evaluation-group-row-success:hover {
+    background: color-mix(in srgb, var(--color-success-background) 58%, var(--color-surface));
+}
+
+.evaluation-group-row-danger {
+    background: color-mix(in srgb, var(--color-danger-background) 46%, var(--color-surface));
+    box-shadow: inset 4px 0 0 var(--color-danger);
+}
+
+.evaluation-group-row-danger:hover {
+    background: color-mix(in srgb, var(--color-danger-background) 58%, var(--color-surface));
+}
+
 .evaluation-group-row:focus-visible {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: -2px;
@@ -1207,6 +1225,16 @@ input.evaluation-input {
     border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-xs);
+}
+
+.mobile-card.evaluation-card-success {
+    border-color: color-mix(in srgb, var(--color-success) 28%, var(--color-border));
+    background: color-mix(in srgb, var(--color-success-background) 46%, var(--color-surface));
+}
+
+.mobile-card.evaluation-card-danger {
+    border-color: color-mix(in srgb, var(--color-danger) 28%, var(--color-border));
+    background: color-mix(in srgb, var(--color-danger-background) 46%, var(--color-surface));
 }
 
 .mobile-field {
