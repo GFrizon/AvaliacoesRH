@@ -59,7 +59,7 @@
             ];
     @endphp
 
-    <div x-data="{ sidebarOpen: false }" class="app-shell flex min-h-screen">
+    <div x-data="{ sidebarOpen: false }" @close-sidebar.window="sidebarOpen = false" class="app-shell flex min-h-screen">
         <x-sidebar :nav-items="$navItems" />
         <x-mobile-drawer :nav-items="$navItems" />
 
