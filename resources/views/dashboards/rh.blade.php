@@ -57,7 +57,7 @@
 
     <article class="overview-card {{ $atrasadas->count() > 0 ? 'overview-card-danger' : '' }}">
         <span class="overview-icon bg-danger-background text-danger">
-            <i data-lucide="alarm-clock" class="size-5" aria-hidden="true"></i>
+            <i data-lucide="mail-warning" class="size-5" aria-hidden="true"></i>
         </span>
         <div>
             <p class="metric-label">Atrasadas</p>
