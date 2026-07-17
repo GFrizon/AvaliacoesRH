@@ -8,8 +8,8 @@ use App\Models\Avaliacao;
 use App\Models\Colaborador;
 use App\Models\Setor;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller

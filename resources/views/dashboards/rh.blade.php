@@ -14,13 +14,6 @@
         if ($dias === 1) return 'Vence amanhã';
         return 'Vence em ' . $dias . ' dias';
     };
-
-    $statusResumo = [
-        ['label' => 'Agendadas', 'value' => $cards['Avaliações agendadas'], 'class' => 'bg-surface-active'],
-        ['label' => 'Pendentes', 'value' => $cards['Avaliações pendentes'], 'class' => 'bg-warning'],
-        ['label' => 'Concluídas', 'value' => $cards['Avaliações concluídas'], 'class' => 'bg-success'],
-        ['label' => 'Canceladas', 'value' => $cards['Avaliações canceladas'], 'class' => 'bg-danger'],
-    ];
 @endphp
 
 <x-page-header eyebrow="Visão executiva" title="Dashboard RH" description="Ciclos de avaliação, pendências dos gestores e resultados de efetivação.">
@@ -33,14 +26,14 @@
 </x-page-header>
 
 <div class="dashboard-overview mb-6">
-    <article class="overview-card overview-card-primary">
-        <span class="overview-icon bg-info-background text-info">
-            <i data-lucide="activity" class="size-5" aria-hidden="true"></i>
+    <article class="overview-card overview-card-success">
+        <span class="overview-icon bg-success-background text-success">
+            <i data-lucide="badge-check" class="size-5" aria-hidden="true"></i>
         </span>
         <div>
-            <p class="metric-label">Saúde do ciclo</p>
-            <strong>{{ $taxaConclusao }}%</strong>
-            <span>{{ $cards['Avaliações concluídas'] }} de {{ $totalCiclo }} concluídas</span>
+            <p class="metric-label">Concluídas</p>
+            <strong>{{ $cards['Avaliações concluídas'] }}</strong>
+            <span>{{ $taxaConclusao }}% do ciclo concluído</span>
         </div>
     </article>
 

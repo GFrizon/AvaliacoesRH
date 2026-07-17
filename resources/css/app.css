@@ -1265,6 +1265,11 @@ input.evaluation-input {
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-info-background) 72%, var(--color-surface)), var(--color-surface));
 }
 
+.overview-card-success {
+    border-color: color-mix(in srgb, var(--color-success) 34%, var(--color-border));
+    background: linear-gradient(135deg, var(--color-success-background), var(--color-surface));
+}
+
 .overview-card-warning {
     border-color: color-mix(in srgb, var(--color-warning) 35%, var(--color-border));
     background: linear-gradient(135deg, var(--color-warning-background), var(--color-surface));
