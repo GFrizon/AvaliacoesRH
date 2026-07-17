@@ -50,8 +50,39 @@ class AvaliacaoController extends Controller
                 $query->whereHas('colaborador', fn ($query) => $query->where('unidade_negocio', $request->string('unidade_negocio')->toString()));
             });
 
+        $avaliacoes = $query
+            ->orderByDesc('created_at')
+            ->get();
+
+        $grupos = $avaliacoes
+            ->groupBy(fn (Avaliacao $avaliacao) => implode('-', [
+                $avaliacao->colaborador_id,
+                $avaliacao->gestor_id,
+                $avaliacao->formulario_id,
+            ]))
+            ->map(function ($avaliacoes) {
+                $ordemCiclos = collect(AvaliacaoCiclo::cases())
+                    ->mapWithKeys(fn (AvaliacaoCiclo $ciclo, int $index) => [$ciclo->value => $index]);
+
+                $ordenadas = $avaliacoes->sortBy(fn (Avaliacao $avaliacao) => $ordemCiclos[$avaliacao->ciclo->value] ?? 99);
+                $primeira = $ordenadas->first();
+
+                return [
+                    'colaborador' => $primeira->colaborador,
+                    'gestor' => $primeira->gestor,
+                    'formulario' => $primeira->formulario,
+                    'avaliacoes' => $ordenadas->values(),
+                    'pendentes' => $ordenadas
+                        ->filter(fn (Avaliacao $avaliacao) => in_array($avaliacao->status, [AvaliacaoStatus::Agendada, AvaliacaoStatus::Pendente], true))
+                        ->count(),
+                ];
+            })
+            ->sortBy(fn (array $grupo) => $grupo['colaborador']->nome)
+            ->values();
+
         return view('avaliacoes.index', [
-            'avaliacoes' => $query->latest()->paginate(12)->withQueryString(),
+            'grupos' => $grupos,
+            'totalAvaliacoes' => $avaliacoes->count(),
             'gestores' => User::where('empresa_id', $empresaId)
                 ->where('role', UserRole::Gestor)
                 ->where('is_active', true)

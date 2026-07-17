@@ -14,7 +14,7 @@ enum AvaliacaoStatus: string
         return match ($this) {
             self::Agendada => 'Agendada',
             self::Pendente => 'Pendente',
-            self::Concluida => 'Concluida',
+            self::Concluida => 'Concluída',
             self::Cancelada => 'Cancelada',
         };
     }
