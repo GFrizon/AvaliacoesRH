@@ -1,10 +1,5 @@
 @props(['navItems'])
 
-{{--
-    Drawer de navegação mobile. Requer que o elemento ancestral tenha
-    x-data com a propriedade `sidebarOpen` e o botão de abertura use
-    `x-ref="sidebarTrigger"` (ver components/topbar.blade.php).
---}}
 <template x-teleport="body">
     <div x-show="sidebarOpen" class="z-drawer lg:hidden" style="display: none;" x-cloak>
         <div
@@ -28,27 +23,40 @@
             role="dialog"
             aria-modal="true"
             aria-label="Menu de navegação"
-            class="app-sidebar fixed inset-y-0 left-0 flex w-72 max-w-[85%] flex-col gap-6 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            class="app-sidebar fixed inset-y-0 left-0 flex w-72 max-w-[85%] flex-col gap-5 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
         >
-            <div class="flex items-center justify-between gap-3 px-1">
-                <div class="min-w-0">
-                    <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" class="h-8 w-auto max-w-40 object-contain">
-                    <p class="mt-1 truncate text-xs font-medium uppercase tracking-wide text-foreground-subtle">Suíte RH · Avaliações</p>
+            <div class="flex items-center justify-between gap-3">
+                <div class="sidebar-brand flex-1">
+                    <div class="min-w-0">
+                        <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" class="sidebar-logo">
+                        <p>Suíte RH · Avaliações</p>
+                    </div>
                 </div>
-                <button type="button" @click="sidebarOpen = false" class="btn-ghost size-9 shrink-0 p-0" aria-label="Fechar menu">
+                <button type="button" @click="sidebarOpen = false" class="sidebar-icon-button" aria-label="Fechar menu">
                     <i data-lucide="x" class="size-4" aria-hidden="true"></i>
                 </button>
             </div>
 
             <nav class="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Navegação principal">
-                @include('partials.nav-links', ['navItems' => $navItems, 'closeOnClick' => true])
+                @foreach ($navItems as [$label, $routeName, $icon])
+                    <a
+                        href="{{ route($routeName) }}"
+                        title="{{ $label }}"
+                        @if (request()->routeIs($routeName)) aria-current="page" @endif
+                        @if ($closeOnClick ?? true) @click="sidebarOpen = false" @endif
+                        class="sidebar-nav-item {{ request()->routeIs($routeName) ? 'is-active' : '' }}"
+                    >
+                        <i data-lucide="{{ $icon }}" class="size-4 shrink-0" aria-hidden="true"></i>
+                        <span class="truncate">{{ $label }}</span>
+                    </a>
+                @endforeach
             </nav>
 
-            <div class="flex flex-col gap-3 border-t border-border pt-4">
+            <div class="flex flex-col gap-3 border-t border-white/10 pt-4">
                 <div class="flex items-center justify-between gap-2 px-1">
                     <div class="min-w-0">
-                        <p class="truncate text-xs uppercase tracking-wide text-foreground-subtle">{{ auth()->user()->role->value }}</p>
-                        <p class="truncate text-sm font-medium text-foreground">{{ auth()->user()->name }}</p>
+                        <p class="truncate text-xs uppercase tracking-wide text-white/50">{{ auth()->user()->role->value }}</p>
+                        <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
                     </div>
                     <div class="flex items-center gap-1">
                         <x-install-app-button />
@@ -58,7 +66,7 @@
 
                 <form method="post" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="btn-secondary w-full">
+                    <button type="submit" class="sidebar-nav-item w-full">
                         <i data-lucide="log-out" class="size-4" aria-hidden="true"></i>
                         Sair
                     </button>
