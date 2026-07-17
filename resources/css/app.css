@@ -308,6 +308,26 @@ body {
     color: var(--color-foreground-muted);
 }
 
+.evaluation-group-row {
+    cursor: pointer;
+}
+
+.evaluation-group-row:hover {
+    background: var(--color-surface-hover);
+}
+
+.evaluation-group-row:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: -2px;
+}
+
+.cycle-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
 .cycle-stack {
     display: grid;
     gap: .6rem;
