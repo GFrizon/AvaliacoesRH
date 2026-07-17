@@ -7,6 +7,7 @@ use App\Http\Controllers\ConfiguracaoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\GestorController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\SetorController;
 use App\Http\Controllers\UnidadeNegocioController;
@@ -25,6 +26,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
+    Route::put('/perfil/senha', [PerfilController::class, 'updatePassword'])->name('perfil.password');
 
     Route::get('/avaliacoes', [AvaliacaoController::class, 'index'])->name('avaliacoes.index');
 

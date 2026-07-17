@@ -103,6 +103,6 @@ class UsuarioController extends Controller
 
     private function authorizeUsuario(Request $request, User $usuario): void
     {
-        abort_unless($usuario->empresa_id === $request->user()->empresa_id, 403);
+        abort_unless((int) $usuario->empresa_id === (int) $request->user()->empresa_id, 403);
     }
 }

@@ -73,4 +73,41 @@
         @endforeach
     </div>
 </section>
+
+<section class="app-card mt-6 p-5">
+    <div class="mb-4 flex items-center justify-between gap-3">
+        <div>
+            <h3 class="section-title">Últimos e-mails enfileirados</h3>
+            <p class="card-description mt-1">Mostra quando o sistema colocou mensagens na fila de envio.</p>
+        </div>
+        <x-badge variant="info">{{ $ultimosEmails->count() }}</x-badge>
+    </div>
+
+    <div class="desktop-table table-shell">
+        <table class="w-full text-left text-sm">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3">Quando</th>
+                    <th class="px-4 py-3">Tipo</th>
+                    <th class="px-4 py-3">Destinatário</th>
+                    <th class="px-4 py-3">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+                @forelse ($ultimosEmails as $email)
+                    <tr>
+                        <td class="px-4 py-4 table-text">{{ $email->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="px-4 py-4 table-title">{{ str_replace('_', ' ', $email->tipo) }}</td>
+                        <td class="px-4 py-4 table-text">{{ $email->destinatario }}</td>
+                        <td class="px-4 py-4"><span class="status-pill status-info">{{ $email->status }}</span></td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-4 py-8 text-center text-sm text-foreground-muted">Nenhum e-mail foi enfileirado ainda.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</section>
 @endsection

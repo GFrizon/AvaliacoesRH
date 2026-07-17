@@ -1107,6 +1107,49 @@ input.evaluation-input {
     }
 }
 
+.error-page {
+    min-height: 100vh;
+    background:
+        linear-gradient(135deg, rgb(15 76 129 / 0.10), transparent 38%),
+        var(--color-background);
+}
+
+.error-shell {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 1.5rem;
+}
+
+.error-card {
+    width: min(100%, 32rem);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+}
+
+.error-logo {
+    width: 12rem;
+    height: auto;
+    margin-bottom: 1.5rem;
+}
+
+.error-card h1 {
+    margin-top: .5rem;
+    color: var(--color-foreground);
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.error-card p:not(.page-kicker) {
+    margin: .75rem 0 1.5rem;
+    color: var(--color-foreground-muted);
+    line-height: 1.6;
+}
+
 @media (prefers-reduced-motion: no-preference) {
     .metric-bar span {
         transition: width var(--duration-slow) var(--ease-standard);

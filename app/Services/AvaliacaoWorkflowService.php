@@ -10,6 +10,7 @@ use App\Mail\AvaliacaoPendenteMail;
 use App\Mail\AvaliacoesAgendadasMail;
 use App\Models\Avaliacao;
 use App\Models\Colaborador;
+use App\Models\EmailLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
@@ -77,6 +78,14 @@ class AvaliacaoWorkflowService
 
         Mail::to($colaborador->gestor->email)->queue(new AvaliacoesAgendadasMail($colaborador, $avaliacoes));
 
+        $this->registrarEmail(
+            $colaborador->empresa_id,
+            $avaliacoes->first()?->id,
+            'avaliacoes_agendadas',
+            $colaborador->gestor->email,
+            "Avaliações agendadas: {$colaborador->nome}",
+        );
+
         return true;
     }
 
@@ -110,6 +119,13 @@ class AvaliacaoWorkflowService
                     }
 
                     Mail::to($avaliacao->gestor->email)->queue(new AvaliacaoPendenteMail($avaliacao));
+                    $this->registrarEmail(
+                        $avaliacao->empresa_id,
+                        $avaliacao->id,
+                        'lembrete_pendente',
+                        $avaliacao->gestor->email,
+                        "Avaliação pendente: {$avaliacao->colaborador->nome}",
+                    );
 
                     $avaliacao->update([
                         'ultimo_lembrete_em' => now(),
@@ -132,6 +148,13 @@ class AvaliacaoWorkflowService
         }
 
         Mail::to($avaliacao->gestor->email)->queue(new AvaliacaoPendenteMail($avaliacao));
+        $this->registrarEmail(
+            $avaliacao->empresa_id,
+            $avaliacao->id,
+            'avaliacao_pendente',
+            $avaliacao->gestor->email,
+            "Avaliação pendente: {$avaliacao->colaborador->nome}",
+        );
 
         $avaliacao->update([
             'status' => AvaliacaoStatus::Pendente,
@@ -156,6 +179,13 @@ class AvaliacaoWorkflowService
                 }
 
                 Mail::to($rh->email)->queue(new AvaliacaoConcluidaMail($avaliacao));
+                $this->registrarEmail(
+                    $avaliacao->empresa_id,
+                    $avaliacao->id,
+                    'avaliacao_concluida',
+                    $rh->email,
+                    "Avaliação concluída: {$avaliacao->colaborador->nome}",
+                );
                 $total++;
             });
 
@@ -188,5 +218,18 @@ class AvaliacaoWorkflowService
             AvaliacaoCiclo::SeisMeses => $base->addMonths(6),
             AvaliacaoCiclo::UmAno => $base->addYear(),
         };
+    }
+
+    private function registrarEmail(int $empresaId, ?int $avaliacaoId, string $tipo, string $destinatario, string $assunto): void
+    {
+        EmailLog::create([
+            'empresa_id' => $empresaId,
+            'avaliacao_id' => $avaliacaoId,
+            'tipo' => $tipo,
+            'destinatario' => $destinatario,
+            'assunto' => $assunto,
+            'status' => 'enfileirado',
+            'enfileirado_em' => now(),
+        ]);
     }
 }

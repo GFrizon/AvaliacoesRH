@@ -42,6 +42,12 @@ class AvaliacaoWorkflowTest extends TestCase
 
         $this->assertSame(AvaliacaoStatus::Pendente, $avaliacao->status);
         $this->assertNotNull($avaliacao->notificado_em);
+        $this->assertDatabaseHas('email_logs', [
+            'avaliacao_id' => $avaliacao->id,
+            'destinatario' => $gestor->email,
+            'tipo' => 'avaliacao_pendente',
+            'status' => 'enfileirado',
+        ]);
     }
 
     public function test_not_effective_result_cancels_future_evaluations(): void
@@ -114,6 +120,12 @@ class AvaliacaoWorkflowTest extends TestCase
         Mail::assertQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rh->email));
         Mail::assertQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($outroRh->email));
         Mail::assertNotQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rhInativo->email));
+        $this->assertDatabaseHas('email_logs', [
+            'avaliacao_id' => $avaliacao->id,
+            'destinatario' => $rh->email,
+            'tipo' => 'avaliacao_concluida',
+            'status' => 'enfileirado',
+        ]);
     }
 
     private function makeAvaliacao(array $overrides): array

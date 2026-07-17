@@ -1,7 +1,3 @@
-{{--
-    Topbar: requer que o ancestral tenha x-data com `sidebarOpen`.
-    O botão de menu só aparece abaixo de "lg" (onde a sidebar vira drawer).
---}}
 <header class="app-topbar sticky top-0 z-sticky flex h-[var(--header-height)] items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] sm:px-6">
     <div class="flex min-w-0 items-center gap-3">
         <button
@@ -16,10 +12,10 @@
 
         <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" class="h-7 w-auto max-w-32 object-contain lg:hidden">
 
-        <div class="min-w-0">
+        <a href="{{ route('perfil.edit') }}" class="min-w-0 rounded-md px-2 py-1 transition-colors hover:bg-surface-hover">
             <p class="truncate text-xs uppercase tracking-wide text-foreground-subtle">{{ auth()->user()->role->value }}</p>
             <p class="max-w-[10rem] truncate text-sm font-semibold text-foreground sm:max-w-none">{{ auth()->user()->name }}</p>
-        </div>
+        </a>
     </div>
 
     <div class="flex shrink-0 items-center gap-2">
@@ -32,6 +28,10 @@
             <span class="hidden sm:inline">Offline</span>
         </span>
 
+        <a href="{{ route('perfil.edit') }}" class="btn-secondary hidden sm:inline-flex">
+            <i data-lucide="user-cog" class="size-4" aria-hidden="true"></i>
+            Perfil
+        </a>
         <x-install-app-button class="hidden sm:block" />
         <x-theme-toggle class="hidden sm:block" />
 
