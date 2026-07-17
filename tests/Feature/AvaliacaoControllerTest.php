@@ -218,7 +218,7 @@ class AvaliacaoControllerTest extends TestCase
         Mail::assertNothingQueued();
     }
 
-    public function test_gestor_opening_wrong_evaluation_is_redirected_to_own_pending_evaluation(): void
+    public function test_gestor_opening_wrong_evaluation_is_redirected_to_index(): void
     {
         $empresa = Empresa::create(['nome' => 'Empresa Demo']);
         $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'Administrativo']);
@@ -249,7 +249,7 @@ class AvaliacaoControllerTest extends TestCase
             'nome' => 'Ana Beatriz',
             'cargo' => 'Designer',
         ]);
-        $avaliacaoDoGestor = Avaliacao::create([
+        Avaliacao::create([
             'empresa_id' => $empresa->id,
             'colaborador_id' => $colaborador->id,
             'gestor_id' => $gestor->id,
@@ -270,7 +270,7 @@ class AvaliacaoControllerTest extends TestCase
 
         $this->actingAs($gestor)
             ->get(route('avaliacoes.show', $avaliacaoDeOutroGestor))
-            ->assertRedirect(route('avaliacoes.show', $avaliacaoDoGestor))
-            ->assertSessionHas('status', 'Abrimos a avaliação pendente vinculada ao seu usuário.');
+            ->assertRedirect(route('avaliacoes.index'))
+            ->assertSessionHas('status', 'Essa avaliação não está vinculada ao seu usuário.');
     }
 }
