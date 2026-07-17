@@ -4,9 +4,9 @@
 @php
     $primeiroNome = strtok(auth()->user()->name, ' ');
     $prazoLabel = function ($dias) {
-        if ($dias < 0) return 'Atrasada ha ' . abs($dias) . ' dia' . (abs($dias) === 1 ? '' : 's');
+        if ($dias < 0) return 'Atrasada há ' . abs($dias) . ' dia' . (abs($dias) === 1 ? '' : 's');
         if ($dias === 0) return 'Vence hoje';
-        if ($dias === 1) return 'Vence amanha';
+        if ($dias === 1) return 'Vence amanhã';
         return 'Vence em ' . $dias . ' dias';
     };
 @endphp
@@ -27,7 +27,7 @@
         <p class="metric-value">{{ $venceHojeCount }}</p>
     </article>
     <article class="dashboard-signal">
-        <p class="metric-label">Concluidas</p>
+        <p class="metric-label">Concluídas</p>
         <p class="metric-value">{{ $concluidasCount }}</p>
     </article>
 </div>

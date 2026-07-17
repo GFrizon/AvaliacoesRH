@@ -1,20 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-    <div>
-        <p class="page-kicker">Modelo oficial</p>
-        <h2 class="page-title mt-1">Editar formulário</h2>
-        <p class="mt-2 max-w-3xl text-sm text-slate-400">Altere textos, ordem e tipos das perguntas. Perguntas removidas deixam de aparecer nas próximas avaliações, mas continuam preservadas no histórico.</p>
-    </div>
-    <a href="{{ route('formularios.show', $formulario) }}" class="btn-secondary">Visualizar</a>
-</div>
+<x-page-header
+    eyebrow="Modelo oficial"
+    title="Editar formulário"
+    description="Altere textos, ordem e tipos das perguntas. Perguntas removidas deixam de aparecer nas próximas avaliações, mas continuam preservadas no histórico."
+>
+    <x-slot:actions>
+        <a href="{{ route('formularios.show', $formulario) }}" class="btn-secondary">Visualizar</a>
+    </x-slot:actions>
+</x-page-header>
 
 <form method="post" action="{{ route('formularios.update', $formulario) }}" class="space-y-6">
     @csrf
     @method('put')
 
-    <section class="app-card rounded-2xl p-5">
+    <section class="app-card p-5">
         <div class="grid gap-5 md:grid-cols-2">
             <label class="block">
                 <span class="text-sm text-slate-300">Nome</span>
@@ -45,10 +46,10 @@
         </label>
     </section>
 
-    <section class="app-card rounded-2xl p-5">
+    <section class="app-card p-5">
         <div class="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
             <div>
-                <h3 class="font-semibold text-white">Perguntas</h3>
+                <h3 class="card-title">Perguntas</h3>
                 <p class="text-sm text-slate-400">{{ $formulario->perguntas->where('is_active', true)->count() }} ativas de {{ $formulario->perguntas->count() }} cadastradas.</p>
             </div>
             <button class="btn-primary" type="submit">
@@ -59,7 +60,7 @@
 
         <div class="space-y-4">
             @foreach ($formulario->perguntas as $pergunta)
-                <article class="rounded-2xl border border-white/10 bg-slate-950/40 p-4 {{ $pergunta->is_active ? '' : 'opacity-55' }}">
+                <article class="question-item {{ $pergunta->is_active ? '' : 'opacity-60' }}">
                     <div class="grid gap-4 xl:grid-cols-[84px_1.1fr_.7fr_150px_120px_auto] xl:items-start">
                         <label>
                             <span class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Ordem</span>
@@ -92,7 +93,7 @@
 
                         <div class="flex gap-2 pt-6 xl:justify-end">
                             @if ($pergunta->is_active)
-                                <button class="inline-flex items-center justify-center rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/15" form="delete-question-{{ $pergunta->id }}" type="submit">
+                                <button class="btn-danger px-3 py-2" form="delete-question-{{ $pergunta->id }}" type="submit">
                                     Remover
                                 </button>
                             @else
@@ -119,8 +120,8 @@
     </form>
 @endforeach
 
-<section class="app-card mt-6 rounded-2xl p-5">
-    <h3 class="font-semibold text-white">Adicionar pergunta</h3>
+<section class="app-card mt-6 p-5">
+    <h3 class="card-title">Adicionar pergunta</h3>
     <form method="post" action="{{ route('formularios.perguntas.store', $formulario) }}" class="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr_180px_auto] lg:items-end">
         @csrf
         <label>
