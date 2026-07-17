@@ -158,8 +158,26 @@ class AvaliacaoController extends Controller
         ]);
     }
 
-    public function show(Request $request, Avaliacao $avaliacao): View
+    public function show(Request $request, Avaliacao $avaliacao): View|RedirectResponse
     {
+        if ($request->user()->isGestor() && $avaliacao->gestor_id !== $request->user()->id) {
+            $pendente = Avaliacao::query()
+                ->where('gestor_id', $request->user()->id)
+                ->where('status', AvaliacaoStatus::Pendente)
+                ->orderBy('data_limite')
+                ->first();
+
+            if ($pendente) {
+                return redirect()
+                    ->route('avaliacoes.show', $pendente)
+                    ->with('status', 'Abrimos a avaliação pendente vinculada ao seu usuário.');
+            }
+
+            return redirect()
+                ->route('dashboard')
+                ->with('status', 'Essa avaliação não está vinculada ao seu usuário.');
+        }
+
         $this->authorizeAccess($request, $avaliacao);
 
         $avaliacao->load(['colaborador.setor', 'gestor', 'formulario.perguntas', 'respostas']);

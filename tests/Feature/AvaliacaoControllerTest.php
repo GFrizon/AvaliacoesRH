@@ -217,4 +217,60 @@ class AvaliacaoControllerTest extends TestCase
 
         Mail::assertNothingQueued();
     }
+
+    public function test_gestor_opening_wrong_evaluation_is_redirected_to_own_pending_evaluation(): void
+    {
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'Administrativo']);
+        $gestor = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Gestor,
+        ]);
+        $outroGestor = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Gestor,
+        ]);
+        $formulario = Formulario::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Avaliação ADM',
+            'tipo' => FormularioTipo::Administrativo,
+        ]);
+        $colaborador = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Joao Victor',
+            'cargo' => 'Analista',
+        ]);
+        $outroColaborador = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $outroGestor->id,
+            'nome' => 'Ana Beatriz',
+            'cargo' => 'Designer',
+        ]);
+        $avaliacaoDoGestor = Avaliacao::create([
+            'empresa_id' => $empresa->id,
+            'colaborador_id' => $colaborador->id,
+            'gestor_id' => $gestor->id,
+            'formulario_id' => $formulario->id,
+            'ciclo' => AvaliacaoCiclo::NoventaDias,
+            'status' => AvaliacaoStatus::Pendente,
+            'data_limite' => now()->addDays(10),
+        ]);
+        $avaliacaoDeOutroGestor = Avaliacao::create([
+            'empresa_id' => $empresa->id,
+            'colaborador_id' => $outroColaborador->id,
+            'gestor_id' => $outroGestor->id,
+            'formulario_id' => $formulario->id,
+            'ciclo' => AvaliacaoCiclo::NoventaDias,
+            'status' => AvaliacaoStatus::Pendente,
+            'data_limite' => now()->addDays(20),
+        ]);
+
+        $this->actingAs($gestor)
+            ->get(route('avaliacoes.show', $avaliacaoDeOutroGestor))
+            ->assertRedirect(route('avaliacoes.show', $avaliacaoDoGestor))
+            ->assertSessionHas('status', 'Abrimos a avaliação pendente vinculada ao seu usuário.');
+    }
 }
