@@ -118,19 +118,19 @@
 [data-theme="dark"] {
     color-scheme: dark;
 
-    --c-background: #111827;
-    --c-background-subtle: #0d1422;
-    --c-surface: #172033;
-    --c-surface-raised: #1c2740;
-    --c-surface-hover: #22304c;
-    --c-surface-active: #2b3957;
+    --c-background: #06080c;
+    --c-background-subtle: #090d13;
+    --c-surface: #0d1118;
+    --c-surface-raised: #111722;
+    --c-surface-hover: #17202d;
+    --c-surface-active: #1e2938;
 
     --c-foreground: #eef3fb;
     --c-foreground-muted: #aeb8c8;
     --c-foreground-subtle: #788498;
 
-    --c-border: #2a3852;
-    --c-border-strong: #3b4e70;
+    --c-border: #222a36;
+    --c-border-strong: #323d4d;
 
     --c-primary: #f5be00;
     --c-primary-hover: #ffd34a;

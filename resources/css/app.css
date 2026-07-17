@@ -165,6 +165,40 @@ body {
     border-bottom: 1px solid var(--color-border);
 }
 
+.topbar-user-link {
+    border: 1px solid transparent;
+}
+
+.topbar-user-link:hover {
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .app-sidebar {
+    background: linear-gradient(180deg, #090d14 0%, #0b111b 54%, #070a10 100%);
+    border-right-color: rgb(255 255 255 / 0.07);
+}
+
+[data-theme="dark"] .sidebar-brand {
+    background: rgb(255 255 255 / 0.045);
+}
+
+[data-theme="dark"] .sidebar-nav-item {
+    color: rgb(255 255 255 / 0.68);
+}
+
+[data-theme="dark"] .sidebar-nav-item:hover {
+    background: rgb(255 255 255 / 0.07);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .sidebar-nav-item.is-active {
+    background: rgb(255 255 255 / 0.085);
+}
+
+[data-theme="dark"] .app-topbar {
+    background: #0b0e14;
+}
+
 .app-content {
     color: var(--color-foreground);
 }
@@ -1325,6 +1359,14 @@ input.evaluation-input {
     .app-topbar {
         gap: .5rem;
         padding-inline: .75rem;
+    }
+
+    .topbar-user-link {
+        display: none;
+    }
+
+    .app-topbar img[alt="Bakof Tec"] {
+        max-width: 7.5rem;
     }
 
     .app-topbar > div:first-child {

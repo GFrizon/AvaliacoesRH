@@ -23,7 +23,7 @@
             role="dialog"
             aria-modal="true"
             aria-label="Menu de navegação"
-            class="app-sidebar fixed inset-y-0 left-0 flex w-[18.5rem] max-w-[82%] flex-col gap-4 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            class="app-sidebar fixed inset-y-0 left-0 flex w-[17rem] max-w-[78%] flex-col gap-4 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
         >
             <div class="flex items-center justify-between gap-3">
                 <div class="sidebar-brand flex-1">
@@ -55,7 +55,7 @@
             <div class="flex flex-col gap-3 border-t border-white/10 pt-4">
                 <a href="{{ route('perfil.edit') }}" class="sidebar-user-card" @click="sidebarOpen = false">
                     <div class="min-w-0">
-                        <p class="truncate text-xs uppercase tracking-wide text-white/50">{{ auth()->user()->role->value }}</p>
+                        <p class="truncate text-xs uppercase tracking-wide text-white/50">Meu perfil · {{ auth()->user()->role->value }}</p>
                         <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
                     </div>
                     <i data-lucide="user-cog" class="size-4 shrink-0 text-white/55" aria-hidden="true"></i>

@@ -12,7 +12,7 @@
 
         <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" class="h-7 w-auto max-w-32 object-contain lg:hidden">
 
-        <a href="{{ route('perfil.edit') }}" class="min-w-0 rounded-md px-2 py-1 transition-colors hover:bg-surface-hover">
+        <a href="{{ route('perfil.edit') }}" class="topbar-user-link min-w-0 rounded-md px-2 py-1 transition-colors hover:bg-surface-hover">
             <p class="truncate text-xs uppercase tracking-wide text-foreground-subtle">{{ auth()->user()->role->value }}</p>
             <p class="max-w-[10rem] truncate text-sm font-semibold text-foreground sm:max-w-none">{{ auth()->user()->name }}</p>
         </a>
@@ -28,10 +28,6 @@
             <span class="hidden sm:inline">Offline</span>
         </span>
 
-        <a href="{{ route('perfil.edit') }}" class="btn-secondary hidden md:inline-flex">
-            <i data-lucide="user-cog" class="size-4" aria-hidden="true"></i>
-            Perfil
-        </a>
         <x-install-app-button class="hidden md:block" />
         <x-theme-toggle class="hidden md:block" />
 
