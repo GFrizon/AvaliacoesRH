@@ -236,12 +236,12 @@ class AvaliacaoController extends Controller
         $user = $request->user();
 
         if ($user->isGestor()) {
-            abort_unless($avaliacao->gestor_id === $user->id, 403);
+            abort_unless((int) $avaliacao->gestor_id === (int) $user->id, 403);
 
             return;
         }
 
-        abort_unless($avaliacao->empresa_id === $user->empresa_id, 403);
+        abort_unless((int) $avaliacao->empresa_id === (int) $user->empresa_id, 403);
     }
 
     private function dataLimitePadrao(Colaborador $colaborador, AvaliacaoCiclo $ciclo)
