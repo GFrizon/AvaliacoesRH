@@ -4,7 +4,7 @@
 <x-page-header
     eyebrow="Operação"
     title="Configurações"
-    description="Estado dos pontos que precisam estar corretos para e-mails, filas e rotinas automáticas."
+    description="Estado dos pontos que precisam estar corretos para e-mails e rotinas automáticas."
 />
 
 <div class="grid gap-5 lg:grid-cols-3">
@@ -33,14 +33,17 @@
                 <i data-lucide="list-checks" class="size-5"></i>
             </div>
             <div>
-                <h3 class="card-title">Fila de envio</h3>
-                <p class="card-description mt-0">E-mails aguardam aqui até o cron processar.</p>
+                <h3 class="card-title">Rotinas</h3>
+                <p class="card-description mt-0">O cron libera avaliações no prazo.</p>
             </div>
         </div>
         <div class="space-y-3 text-sm">
-            <div class="config-row"><span>Conexão</span><strong>{{ $queueConnection }}</strong></div>
-            <div class="config-row"><span>Pendentes</span><strong>{{ $jobsPendentes }}</strong></div>
-            <div class="config-row"><span>Falhados</span><strong class="{{ $jobsFalhados > 0 ? 'text-danger' : '' }}">{{ $jobsFalhados }}</strong></div>
+            <div class="config-row"><span>Conexão de fila</span><strong>{{ $queueConnection }}</strong></div>
+            <div class="config-row"><span>Jobs pendentes</span><strong>{{ $jobsPendentes }}</strong></div>
+            <div class="config-row"><span>Jobs falhados</span><strong class="{{ $jobsFalhados > 0 ? 'text-danger' : '' }}">{{ $jobsFalhados }}</strong></div>
+            <div class="rounded-lg border border-info bg-info-background px-3 py-2 text-info">
+                Os e-mails agora são enviados direto pelo SMTP, sem aguardar a fila.
+            </div>
         </div>
     </section>
 
@@ -55,9 +58,6 @@
             </div>
         </div>
         <div class="space-y-3 text-sm">
-            <div class="rounded-lg border border-border bg-background p-3">
-                <code class="text-xs text-foreground-muted">* * * * * cd /home/bkteccom/avaliacoes && php artisan queue:work --stop-when-empty --tries=3 --timeout=120 >> /home/bkteccom/avaliacoes/storage/logs/queue.log 2>&1</code>
-            </div>
             <div class="rounded-lg border border-border bg-background p-3">
                 <code class="text-xs text-foreground-muted">* * * * * cd /home/bkteccom/avaliacoes && php artisan schedule:run >> /home/bkteccom/avaliacoes/storage/logs/schedule.log 2>&1</code>
             </div>
@@ -77,8 +77,8 @@
 <section class="app-card mt-6 p-5">
     <div class="mb-4 flex items-center justify-between gap-3">
         <div>
-            <h3 class="section-title">Últimos e-mails enfileirados</h3>
-            <p class="card-description mt-1">Mostra quando o sistema colocou mensagens na fila de envio.</p>
+            <h3 class="section-title">Últimas tentativas de e-mail</h3>
+            <p class="card-description mt-1">Mostra os envios feitos pelo SMTP e possíveis falhas.</p>
         </div>
         <x-badge variant="info">{{ $ultimosEmails->count() }}</x-badge>
     </div>
@@ -99,11 +99,18 @@
                         <td class="px-4 py-4 table-text">{{ $email->created_at->format('d/m/Y H:i') }}</td>
                         <td class="px-4 py-4 table-title">{{ str_replace('_', ' ', $email->tipo) }}</td>
                         <td class="px-4 py-4 table-text">{{ $email->destinatario }}</td>
-                        <td class="px-4 py-4"><span class="status-pill status-info">{{ $email->status }}</span></td>
+                        <td class="px-4 py-4">
+                            <span class="status-pill {{ $email->status === 'enviado' ? 'status-success' : ($email->status === 'falhou' ? 'status-danger' : 'status-info') }}">
+                                {{ $email->status }}
+                            </span>
+                            @if ($email->erro)
+                                <p class="mt-1 max-w-sm text-xs text-danger">{{ $email->erro }}</p>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-4 py-8 text-center text-sm text-foreground-muted">Nenhum e-mail foi enfileirado ainda.</td>
+                        <td colspan="4" class="px-4 py-8 text-center text-sm text-foreground-muted">Nenhuma tentativa de e-mail registrada ainda.</td>
                     </tr>
                 @endforelse
             </tbody>

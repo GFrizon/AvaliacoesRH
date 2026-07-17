@@ -13,8 +13,10 @@ use App\Models\Colaborador;
 use App\Models\EmailLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class AvaliacaoWorkflowService
 {
@@ -76,17 +78,14 @@ class AvaliacaoWorkflowService
             return false;
         }
 
-        Mail::to($colaborador->gestor->email)->queue(new AvaliacoesAgendadasMail($colaborador, $avaliacoes));
-
-        $this->registrarEmail(
+        return $this->enviarEmail(
             $colaborador->empresa_id,
             $avaliacoes->first()?->id,
             'avaliacoes_agendadas',
             $colaborador->gestor->email,
             "Avaliações agendadas: {$colaborador->nome}",
+            new AvaliacoesAgendadasMail($colaborador, $avaliacoes),
         );
-
-        return true;
     }
 
     public function enviarPendentesVencidas(): int
@@ -118,14 +117,18 @@ class AvaliacaoWorkflowService
                         continue;
                     }
 
-                    Mail::to($avaliacao->gestor->email)->queue(new AvaliacaoPendenteMail($avaliacao));
-                    $this->registrarEmail(
+                    $enviado = $this->enviarEmail(
                         $avaliacao->empresa_id,
                         $avaliacao->id,
                         'lembrete_pendente',
                         $avaliacao->gestor->email,
                         "Avaliação pendente: {$avaliacao->colaborador->nome}",
+                        new AvaliacaoPendenteMail($avaliacao),
                     );
+
+                    if (! $enviado) {
+                        continue;
+                    }
 
                     $avaliacao->update([
                         'ultimo_lembrete_em' => now(),
@@ -147,14 +150,18 @@ class AvaliacaoWorkflowService
             return false;
         }
 
-        Mail::to($avaliacao->gestor->email)->queue(new AvaliacaoPendenteMail($avaliacao));
-        $this->registrarEmail(
+        $enviado = $this->enviarEmail(
             $avaliacao->empresa_id,
             $avaliacao->id,
             'avaliacao_pendente',
             $avaliacao->gestor->email,
             "Avaliação pendente: {$avaliacao->colaborador->nome}",
+            new AvaliacaoPendenteMail($avaliacao),
         );
+
+        if (! $enviado) {
+            return false;
+        }
 
         $avaliacao->update([
             'status' => AvaliacaoStatus::Pendente,
@@ -178,15 +185,18 @@ class AvaliacaoWorkflowService
                     return;
                 }
 
-                Mail::to($rh->email)->queue(new AvaliacaoConcluidaMail($avaliacao));
-                $this->registrarEmail(
+                $enviado = $this->enviarEmail(
                     $avaliacao->empresa_id,
                     $avaliacao->id,
                     'avaliacao_concluida',
                     $rh->email,
                     "Avaliação concluída: {$avaliacao->colaborador->nome}",
+                    new AvaliacaoConcluidaMail($avaliacao),
                 );
-                $total++;
+
+                if ($enviado) {
+                    $total++;
+                }
             });
 
         return $total;
@@ -220,7 +230,22 @@ class AvaliacaoWorkflowService
         };
     }
 
-    private function registrarEmail(int $empresaId, ?int $avaliacaoId, string $tipo, string $destinatario, string $assunto): void
+    private function enviarEmail(int $empresaId, ?int $avaliacaoId, string $tipo, string $destinatario, string $assunto, Mailable $mail): bool
+    {
+        try {
+            Mail::to($destinatario)->send($mail);
+        } catch (Throwable $exception) {
+            $this->registrarEmail($empresaId, $avaliacaoId, $tipo, $destinatario, $assunto, 'falhou', $exception->getMessage());
+
+            return false;
+        }
+
+        $this->registrarEmail($empresaId, $avaliacaoId, $tipo, $destinatario, $assunto, 'enviado');
+
+        return true;
+    }
+
+    private function registrarEmail(int $empresaId, ?int $avaliacaoId, string $tipo, string $destinatario, string $assunto, string $status, ?string $erro = null): void
     {
         EmailLog::create([
             'empresa_id' => $empresaId,
@@ -228,8 +253,9 @@ class AvaliacaoWorkflowService
             'tipo' => $tipo,
             'destinatario' => $destinatario,
             'assunto' => $assunto,
-            'status' => 'enfileirado',
+            'status' => $status,
             'enfileirado_em' => now(),
+            'erro' => $erro,
         ]);
     }
 }

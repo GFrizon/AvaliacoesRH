@@ -105,6 +105,6 @@ class ColaboradorControllerTest extends TestCase
         ]);
         $this->assertSame(3, Avaliacao::count());
         $this->assertSame(3, Avaliacao::where('status', AvaliacaoStatus::Agendada)->count());
-        Mail::assertQueued(AvaliacoesAgendadasMail::class, fn ($mail) => $mail->hasTo($gestor->email));
+        Mail::assertSent(AvaliacoesAgendadasMail::class, fn ($mail) => $mail->hasTo($gestor->email));
     }
 }

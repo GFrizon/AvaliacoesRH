@@ -283,10 +283,10 @@ class AvaliacaoController extends Controller
         };
 
         if ($enviados === 0) {
-            return back()->with('status', 'Nenhum e-mail foi colocado na fila. Verifique se há destinatário ativo com e-mail cadastrado.');
+            return back()->with('status', 'Nenhum e-mail foi enviado. Verifique se há destinatário ativo com e-mail cadastrado e se o SMTP está funcionando.');
         }
 
-        return back()->with('status', $enviados === 1 ? 'E-mail colocado na fila de envio.' : "{$enviados} e-mails colocados na fila de envio.");
+        return back()->with('status', $enviados === 1 ? 'E-mail enviado.' : "{$enviados} e-mails enviados.");
     }
 
     private function authorizeAccess(Request $request, Avaliacao $avaliacao): void

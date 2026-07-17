@@ -78,7 +78,7 @@ class AvaliacaoControllerTest extends TestCase
             'status' => 'pendente',
         ]);
         $this->assertSame('2026-04-01', $avaliacao->data_limite->toDateString());
-        Mail::assertQueued(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
+        Mail::assertSent(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
     }
 
     public function test_rh_can_create_avaliacao_with_quick_colaborador(): void
@@ -132,7 +132,7 @@ class AvaliacaoControllerTest extends TestCase
         $this->assertSame($colaborador->id, $avaliacao->colaborador_id);
         $this->assertSame('2026-10-01', $avaliacao->data_limite->toDateString());
         $this->assertSame('pendente', $avaliacao->status->value);
-        Mail::assertQueued(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
+        Mail::assertSent(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
     }
 
     public function test_rh_can_resend_pending_evaluation_email(): void
@@ -173,9 +173,9 @@ class AvaliacaoControllerTest extends TestCase
 
         $this->actingAs($rh)
             ->post(route('avaliacoes.reenviar-email', $avaliacao))
-            ->assertSessionHas('status', 'E-mail colocado na fila de envio.');
+            ->assertSessionHas('status', 'E-mail enviado.');
 
-        Mail::assertQueued(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
+        Mail::assertSent(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
         $this->assertNotNull($avaliacao->refresh()->ultimo_lembrete_em);
     }
 
@@ -215,7 +215,7 @@ class AvaliacaoControllerTest extends TestCase
             ->post(route('avaliacoes.reenviar-email', $avaliacao))
             ->assertForbidden();
 
-        Mail::assertNothingQueued();
+        Mail::assertNothingSent();
     }
 
     public function test_gestor_opening_wrong_evaluation_is_redirected_to_index(): void

@@ -4,14 +4,13 @@ namespace App\Mail;
 
 use App\Models\Colaborador;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AvaliacoesAgendadasMail extends Mailable implements ShouldQueue
+class AvaliacoesAgendadasMail extends Mailable
 {
     use Queueable, SerializesModels;
 

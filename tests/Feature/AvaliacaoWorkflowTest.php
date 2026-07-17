@@ -37,7 +37,7 @@ class AvaliacaoWorkflowTest extends TestCase
             ->expectsOutput('E-mails enviados: 1')
             ->assertSuccessful();
 
-        Mail::assertQueued(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
+        Mail::assertSent(AvaliacaoPendenteMail::class, fn ($mail) => $mail->hasTo($gestor->email));
         $avaliacao->refresh();
 
         $this->assertSame(AvaliacaoStatus::Pendente, $avaliacao->status);
@@ -46,7 +46,7 @@ class AvaliacaoWorkflowTest extends TestCase
             'avaliacao_id' => $avaliacao->id,
             'destinatario' => $gestor->email,
             'tipo' => 'avaliacao_pendente',
-            'status' => 'enfileirado',
+            'status' => 'enviado',
         ]);
     }
 
@@ -83,7 +83,7 @@ class AvaliacaoWorkflowTest extends TestCase
         $this->assertSame(AvaliacaoStatus::Concluida, $avaliacao->refresh()->status);
         $this->assertFalse($avaliacao->efetivar);
         $this->assertSame(AvaliacaoStatus::Cancelada, $futura->refresh()->status);
-        Mail::assertQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rh->email));
+        Mail::assertSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rh->email));
     }
 
     public function test_rh_users_receive_email_when_evaluation_is_submitted(): void
@@ -117,14 +117,14 @@ class AvaliacaoWorkflowTest extends TestCase
             ->assertRedirect(route('avaliacoes.index'));
 
         $this->assertSame(AvaliacaoStatus::Concluida, $avaliacao->refresh()->status);
-        Mail::assertQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rh->email));
-        Mail::assertQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($outroRh->email));
-        Mail::assertNotQueued(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rhInativo->email));
+        Mail::assertSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rh->email));
+        Mail::assertSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($outroRh->email));
+        Mail::assertNotSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rhInativo->email));
         $this->assertDatabaseHas('email_logs', [
             'avaliacao_id' => $avaliacao->id,
             'destinatario' => $rh->email,
             'tipo' => 'avaliacao_concluida',
-            'status' => 'enfileirado',
+            'status' => 'enviado',
         ]);
     }
 
