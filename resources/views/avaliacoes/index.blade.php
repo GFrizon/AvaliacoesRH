@@ -12,10 +12,13 @@
     </x-slot:actions>
 </x-page-header>
 
-<form class="filter-card mb-6 grid gap-3 lg:grid-cols-[1.3fr_repeat(4,minmax(0,1fr))_auto]">
-    <input name="busca" value="{{ request('busca') }}" placeholder="Buscar colaborador, CPF ou cargo" class="app-input min-h-10 px-3 text-sm">
+<form
+    class="filter-card mb-6 grid gap-3 lg:grid-cols-[1.3fr_repeat(4,minmax(0,1fr))_auto]"
+    x-data="{ timer: null, submitSoon() { clearTimeout(this.timer); this.timer = setTimeout(() => this.$el.requestSubmit(), 450) } }"
+>
+    <input name="busca" value="{{ request('busca') }}" placeholder="Buscar colaborador, CPF ou cargo" class="app-input min-h-10 px-3 text-sm" @input="submitSoon">
 
-    <select name="status" class="app-input min-h-10 px-3 text-sm">
+    <select name="status" class="app-input min-h-10 px-3 text-sm" @change="$el.form.requestSubmit()">
         <option value="">Todos os status</option>
         @foreach ($statusOptions as $status)
             <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
@@ -23,7 +26,7 @@
     </select>
 
     @if (auth()->user()->isRh())
-        <select name="gestor_id" class="app-input min-h-10 px-3 text-sm">
+        <select name="gestor_id" class="app-input min-h-10 px-3 text-sm" @change="$el.form.requestSubmit()">
             <option value="">Todos os gestores</option>
             @foreach ($gestores as $gestor)
                 <option value="{{ $gestor->id }}" @selected((string) request('gestor_id') === (string) $gestor->id)>{{ $gestor->name }}</option>
@@ -31,14 +34,14 @@
         </select>
     @endif
 
-    <select name="unidade_negocio" class="app-input min-h-10 px-3 text-sm">
+    <select name="unidade_negocio" class="app-input min-h-10 px-3 text-sm" @change="$el.form.requestSubmit()">
         <option value="">Todas as unidades</option>
         @foreach ($unidadesNegocio as $unidade)
             <option value="{{ $unidade }}" @selected(request('unidade_negocio') === $unidade)>{{ $unidade }}</option>
         @endforeach
     </select>
 
-    <select name="ciclo" class="app-input min-h-10 px-3 text-sm">
+    <select name="ciclo" class="app-input min-h-10 px-3 text-sm" @change="$el.form.requestSubmit()">
         <option value="">Todos os ciclos</option>
         @foreach ($ciclos as $ciclo)
             <option value="{{ $ciclo->value }}" @selected(request('ciclo') === $ciclo->value)>{{ $ciclo->label() }}</option>
@@ -46,13 +49,11 @@
     </select>
 
     <div class="flex gap-2">
-        <button class="btn-primary px-3">
-            <i data-lucide="filter" class="size-4"></i>
-            Filtrar
-        </button>
+        <noscript><button class="btn-primary px-3">Filtrar</button></noscript>
         @if (request()->hasAny(['busca', 'status', 'gestor_id', 'unidade_negocio', 'ciclo']))
             <a href="{{ route('avaliacoes.index') }}" class="btn-secondary px-3" title="Limpar filtros">
                 <i data-lucide="x" class="size-4"></i>
+                Limpar
             </a>
         @endif
     </div>
@@ -93,18 +94,13 @@
                     </td>
                     <td class="px-4 py-4 table-text">{{ $avaliacao->ciclo->label() }}</td>
                     <td class="px-4 py-4 table-text">{{ $avaliacao->data_limite->format('d/m/Y') }}</td>
-                    <td class="px-4 py-4">
-                        <span class="status-pill {{ $statusClasses }}">{{ $avaliacao->status->label() }}</span>
-                    </td>
+                    <td class="px-4 py-4"><span class="status-pill {{ $statusClasses }}">{{ $avaliacao->status->label() }}</span></td>
                     <td class="px-4 py-4">
                         <div class="flex justify-end gap-2">
                             @if (auth()->user()->isRh() && in_array($avaliacao->status->value, ['agendada', 'pendente', 'concluida'], true))
                                 <form method="post" action="{{ route('avaliacoes.reenviar-email', $avaliacao) }}">
                                     @csrf
-                                    <button class="btn-secondary px-3 py-2">
-                                        <i data-lucide="mail" class="size-4"></i>
-                                        Reenviar
-                                    </button>
+                                    <button class="btn-secondary px-3 py-2"><i data-lucide="mail" class="size-4"></i>Reenviar</button>
                                 </form>
                             @endif
                             <a href="{{ route('avaliacoes.show', $avaliacao) }}" class="btn-secondary px-3 py-2">Abrir</a>
@@ -152,10 +148,7 @@
                 @if (auth()->user()->isRh() && in_array($avaliacao->status->value, ['agendada', 'pendente', 'concluida'], true))
                     <form method="post" action="{{ route('avaliacoes.reenviar-email', $avaliacao) }}">
                         @csrf
-                        <button class="btn-secondary">
-                            <i data-lucide="mail" class="size-4"></i>
-                            Reenviar
-                        </button>
+                        <button class="btn-secondary"><i data-lucide="mail" class="size-4"></i>Reenviar</button>
                     </form>
                 @endif
                 <a href="{{ route('avaliacoes.show', $avaliacao) }}" class="btn-primary">Abrir</a>

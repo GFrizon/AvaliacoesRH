@@ -10,31 +10,36 @@
     </x-slot:actions>
 </x-page-header>
 
-<form class="filter-card mb-6 grid gap-3 lg:grid-cols-6">
-    <input type="date" name="inicio" value="{{ request('inicio') }}" class="app-input min-h-10 px-3 text-sm">
-    <input type="date" name="fim" value="{{ request('fim') }}" class="app-input min-h-10 px-3 text-sm">
-    <select name="status" class="app-input min-h-10 px-3 text-sm">
+<form class="filter-card mb-6 grid gap-3 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto]">
+    <input type="date" name="inicio" value="{{ request('inicio') }}" class="app-input min-h-10 px-3 text-sm" onchange="this.form.requestSubmit()">
+    <input type="date" name="fim" value="{{ request('fim') }}" class="app-input min-h-10 px-3 text-sm" onchange="this.form.requestSubmit()">
+    <select name="status" class="app-input min-h-10 px-3 text-sm" onchange="this.form.requestSubmit()">
         <option value="">Todos os status</option>
         @foreach ($statusOptions as $status)
             <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
         @endforeach
     </select>
-    <select name="gestor_id" class="app-input min-h-10 px-3 text-sm">
+    <select name="gestor_id" class="app-input min-h-10 px-3 text-sm" onchange="this.form.requestSubmit()">
         <option value="">Todos os gestores</option>
         @foreach ($gestores as $gestor)
             <option value="{{ $gestor->id }}" @selected((string) request('gestor_id') === (string) $gestor->id)>{{ $gestor->name }}</option>
         @endforeach
     </select>
-    <select name="unidade_negocio" class="app-input min-h-10 px-3 text-sm">
+    <select name="unidade_negocio" class="app-input min-h-10 px-3 text-sm" onchange="this.form.requestSubmit()">
         <option value="">Todas as unidades</option>
         @foreach ($unidadesNegocio as $unidade)
             <option value="{{ $unidade }}" @selected(request('unidade_negocio') === $unidade)>{{ $unidade }}</option>
         @endforeach
     </select>
-    <button class="btn-secondary">
-        <i data-lucide="search" class="size-4"></i>
-        Filtrar
-    </button>
+    <div class="flex gap-2">
+        <noscript><button class="btn-secondary">Filtrar</button></noscript>
+        @if (request()->hasAny(['inicio', 'fim', 'status', 'gestor_id', 'unidade_negocio', 'ciclo']))
+            <a href="{{ route('relatorios.index') }}" class="btn-secondary px-3" title="Limpar filtros">
+                <i data-lucide="x" class="size-4"></i>
+                Limpar
+            </a>
+        @endif
+    </div>
 </form>
 
 <div class="desktop-table table-shell">
