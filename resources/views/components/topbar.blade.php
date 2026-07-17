@@ -1,5 +1,5 @@
 {{--
-    Topbar — requer que o ancestral tenha x-data com `sidebarOpen`.
+    Topbar: requer que o ancestral tenha x-data com `sidebarOpen`.
     O botão de menu só aparece abaixo de "lg" (onde a sidebar vira drawer).
 --}}
 <header class="app-topbar sticky top-0 z-sticky flex h-[var(--header-height)] items-center justify-between gap-3 px-4 pt-[env(safe-area-inset-top)] sm:px-6">
@@ -13,6 +13,8 @@
         >
             <i data-lucide="menu" class="size-5" aria-hidden="true"></i>
         </button>
+
+        <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" class="h-7 w-auto max-w-32 object-contain lg:hidden">
 
         <div class="min-w-0">
             <p class="truncate text-xs uppercase tracking-wide text-foreground-subtle">{{ auth()->user()->role->value }}</p>

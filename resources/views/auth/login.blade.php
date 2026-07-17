@@ -13,13 +13,8 @@
     <main class="login-shell" aria-label="Entrar no sistema">
         <section class="login-panel">
             <div class="login-brand" aria-hidden="true">
-                <div class="login-brand-mark">
-                    <i data-lucide="clipboard-check" class="size-6"></i>
-                </div>
-                <div>
-                    <p class="login-product">Avaliações RH</p>
-                    <p class="login-suite">Suite de gestao de ciclos e resultados</p>
-                </div>
+                <img src="{{ asset('images/bakoftec-logo.png') }}" alt="" class="login-brand-logo">
+                <p class="login-suite">Suíte RH · Avaliações</p>
             </div>
 
             <div class="login-copy">

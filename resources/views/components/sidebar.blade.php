@@ -1,10 +1,9 @@
 @props(['navItems'])
 
 {{--
-    Sidebar desktop — fixa, com opção de recolher (largura persistida em
+    Sidebar desktop: fixa, com opção de recolher (largura persistida em
     localStorage). Em telas menores que "lg" ela não é renderizada aqui;
-    o drawer mobile (components/mobile-drawer.blade.php) assume a
-    navegação nesse caso.
+    o drawer mobile (components/mobile-drawer.blade.php) assume a navegação.
 --}}
 <aside
     x-data="{ collapsed: (localStorage.getItem('sidebar-collapsed') === '1') }"
@@ -17,8 +16,8 @@
             <i data-lucide="clipboard-check" class="size-5" aria-hidden="true"></i>
         </div>
         <div x-show="!collapsed" x-transition.opacity.duration.120ms class="min-w-0">
-            <p class="truncate text-xs font-medium uppercase tracking-wide text-foreground-subtle">Suite RH</p>
-            <p class="truncate text-sm font-semibold text-foreground">Avaliações</p>
+            <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" class="h-8 w-auto max-w-36 object-contain">
+            <p class="mt-1 truncate text-xs font-medium uppercase tracking-wide text-foreground-subtle">Suíte RH · Avaliações</p>
         </div>
     </div>
 

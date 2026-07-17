@@ -21,11 +21,6 @@
 
     <title>{{ $title ?? 'Avaliações RH' }}</title>
 
-    {{--
-        Anti-flash de tema: aplica data-theme no <html> antes do primeiro
-        paint, lendo a preferência salva (ou o sistema, se nunca escolhida).
-        Mantido em sincronia com resources/js/theme.js.
-    --}}
     <script>
         (function () {
             try {

@@ -7,7 +7,8 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;border-collapse:collapse;background:#ffffff;border:1px solid #dbe3ef;border-radius:16px;overflow:hidden;">
                     <tr>
                         <td style="padding:28px 32px;background:#0f4c81;color:#ffffff;">
-                            <p style="margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#bfe8ff;">Suite RH - Avaliações</p>
+                            <img src="{{ asset('images/bakoftec-logo.png') }}" alt="Bakof Tec" width="180" style="display:block;width:180px;max-width:70%;height:auto;margin:0 0 18px;">
+                            <p style="margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#bfe8ff;">Suíte RH - Avaliações</p>
                             <h1 style="margin:0;font-size:24px;line-height:1.25;">Avaliações agendadas</h1>
                             <p style="margin:10px 0 0;font-size:15px;color:#e6f7ff;">Novos ciclos foram programados para acompanhamento.</p>
                         </td>

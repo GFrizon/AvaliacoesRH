@@ -542,11 +542,17 @@ input.evaluation-input {
 }
 
 .login-brand {
-    display: flex;
-    align-items: center;
-    gap: .875rem;
+    display: grid;
+    gap: .55rem;
     padding-bottom: 1.35rem;
     border-bottom: 1px solid rgb(15 23 42 / 0.12);
+}
+
+.login-brand-logo {
+    display: block;
+    width: min(15rem, 72vw);
+    height: auto;
+    object-fit: contain;
 }
 
 .login-brand-mark {
