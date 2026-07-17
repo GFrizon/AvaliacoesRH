@@ -81,6 +81,8 @@
                     $pendentes = $grupo['avaliacoes']->filter(fn ($avaliacao) => in_array($avaliacao->status->value, ['agendada', 'pendente'], true))->count();
                     $concluidas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'concluida')->count();
                     $canceladas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'cancelada')->count();
+                    $efetivadas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'concluida' && $avaliacao->efetivar === true)->count();
+                    $naoEfetivadas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'concluida' && $avaliacao->efetivar === false)->count();
                     $proximoPrazo = $grupo['avaliacoes']->sortBy('data_limite')->first()?->data_limite;
                 @endphp
                 <tr
@@ -109,6 +111,12 @@
                             @endif
                             @if ($concluidas > 0)
                                 <span class="status-pill status-success">{{ $concluidas }} concluída{{ $concluidas === 1 ? '' : 's' }}</span>
+                            @endif
+                            @if ($efetivadas > 0)
+                                <span class="status-pill status-success">{{ $efetivadas }} efetivar</span>
+                            @endif
+                            @if ($naoEfetivadas > 0)
+                                <span class="status-pill status-danger">{{ $naoEfetivadas }} não efetivar</span>
                             @endif
                             @if ($canceladas > 0)
                                 <span class="status-pill status-danger">{{ $canceladas }} cancelada{{ $canceladas === 1 ? '' : 's' }}</span>
@@ -174,6 +182,8 @@
             $pendentes = $grupo['avaliacoes']->filter(fn ($avaliacao) => in_array($avaliacao->status->value, ['agendada', 'pendente'], true))->count();
             $concluidas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'concluida')->count();
             $canceladas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'cancelada')->count();
+            $efetivadas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'concluida' && $avaliacao->efetivar === true)->count();
+            $naoEfetivadas = $grupo['avaliacoes']->filter(fn ($avaliacao) => $avaliacao->status->value === 'concluida' && $avaliacao->efetivar === false)->count();
         @endphp
         <article class="mobile-card p-4" x-data="{ open: false }">
             <button type="button" class="w-full text-left" @click="open = !open" :aria-expanded="open">
@@ -192,6 +202,12 @@
                     @endif
                     @if ($concluidas > 0)
                         <span class="status-pill status-success">{{ $concluidas }} concluída{{ $concluidas === 1 ? '' : 's' }}</span>
+                    @endif
+                    @if ($efetivadas > 0)
+                        <span class="status-pill status-success">{{ $efetivadas }} efetivar</span>
+                    @endif
+                    @if ($naoEfetivadas > 0)
+                        <span class="status-pill status-danger">{{ $naoEfetivadas }} não efetivar</span>
                     @endif
                     @if ($canceladas > 0)
                         <span class="status-pill status-danger">{{ $canceladas }} cancelada{{ $canceladas === 1 ? '' : 's' }}</span>
