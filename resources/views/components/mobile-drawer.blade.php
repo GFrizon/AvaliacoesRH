@@ -23,7 +23,7 @@
             role="dialog"
             aria-modal="true"
             aria-label="Menu de navegação"
-            class="app-sidebar fixed inset-y-0 left-0 flex w-72 max-w-[85%] flex-col gap-5 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            class="app-sidebar fixed inset-y-0 left-0 flex w-[18.5rem] max-w-[82%] flex-col gap-4 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
         >
             <div class="flex items-center justify-between gap-3">
                 <div class="sidebar-brand flex-1">
@@ -37,7 +37,7 @@
                 </button>
             </div>
 
-            <nav class="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Navegação principal">
+            <nav class="flex flex-1 flex-col gap-1 overflow-y-auto py-1" aria-label="Navegação principal">
                 @foreach ($navItems as [$label, $routeName, $icon])
                     <a
                         href="{{ route($routeName) }}"
@@ -53,15 +53,17 @@
             </nav>
 
             <div class="flex flex-col gap-3 border-t border-white/10 pt-4">
-                <div class="flex items-center justify-between gap-2 px-1">
+                <a href="{{ route('perfil.edit') }}" class="sidebar-user-card" @click="sidebarOpen = false">
                     <div class="min-w-0">
                         <p class="truncate text-xs uppercase tracking-wide text-white/50">{{ auth()->user()->role->value }}</p>
                         <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
                     </div>
-                    <div class="flex items-center gap-1">
-                        <x-install-app-button />
-                        <x-theme-toggle />
-                    </div>
+                    <i data-lucide="user-cog" class="size-4 shrink-0 text-white/55" aria-hidden="true"></i>
+                </a>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <x-install-app-button class="sidebar-mobile-action" />
+                    <x-theme-toggle class="sidebar-mobile-action" />
                 </div>
 
                 <form method="post" action="{{ route('logout') }}">

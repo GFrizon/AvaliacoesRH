@@ -99,6 +99,33 @@ body {
         box-shadow var(--duration-fast) var(--ease-standard);
 }
 
+.sidebar-user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    border-radius: var(--radius-md);
+    background: rgb(255 255 255 / 0.07);
+    padding: .75rem;
+}
+
+.sidebar-user-card:hover {
+    background: rgb(255 255 255 / 0.10);
+}
+
+.sidebar-mobile-action {
+    width: 100%;
+    min-height: 2.4rem;
+    border: 1px solid rgb(255 255 255 / 0.12) !important;
+    background: rgb(255 255 255 / 0.07) !important;
+    color: rgb(255 255 255 / 0.82) !important;
+}
+
+.sidebar-mobile-action:hover {
+    background: rgb(255 255 255 / 0.12) !important;
+    color: #ffffff !important;
+}
+
 .sidebar-nav-item:hover {
     background: rgb(255 255 255 / 0.09);
     color: #ffffff;
@@ -1288,6 +1315,20 @@ input.evaluation-input {
         width: auto;
         min-height: 2.5rem;
         padding-inline: .75rem;
+    }
+
+    .app-topbar {
+        gap: .5rem;
+        padding-inline: .75rem;
+    }
+
+    .app-topbar > div:first-child {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .app-topbar > div:last-child {
+        gap: .35rem;
     }
 
     .table-shell {

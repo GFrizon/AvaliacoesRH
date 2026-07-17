@@ -28,12 +28,12 @@
             <span class="hidden sm:inline">Offline</span>
         </span>
 
-        <a href="{{ route('perfil.edit') }}" class="btn-secondary hidden sm:inline-flex">
+        <a href="{{ route('perfil.edit') }}" class="btn-secondary hidden md:inline-flex">
             <i data-lucide="user-cog" class="size-4" aria-hidden="true"></i>
             Perfil
         </a>
-        <x-install-app-button class="hidden sm:block" />
-        <x-theme-toggle class="hidden sm:block" />
+        <x-install-app-button class="hidden md:block" />
+        <x-theme-toggle class="hidden md:block" />
 
         <form method="post" action="{{ route('logout') }}">
             @csrf
