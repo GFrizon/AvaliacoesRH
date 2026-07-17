@@ -32,30 +32,54 @@
     </x-slot:actions>
 </x-page-header>
 
-<section class="executive-hero mb-6">
-    <div>
-        <p class="metric-label">Saúde do ciclo</p>
-        <h3>{{ $taxaConclusao }}% concluído</h3>
-        <p>{{ $cards['Avaliações pendentes'] }} pendente{{ $cards['Avaliações pendentes'] === 1 ? '' : 's' }} e {{ $atrasadas->count() }} atrasada{{ $atrasadas->count() === 1 ? '' : 's' }} no momento.</p>
-    </div>
-    <div class="status-stack" aria-label="Distribuição por status">
-        @foreach ($statusResumo as $item)
-            @php($percentual = $totalCiclo > 0 ? round(($item['value'] / $totalCiclo) * 100) : 0)
-            <div>
-                <div class="mb-1 flex items-center justify-between text-xs font-semibold text-foreground-muted">
-                    <span>{{ $item['label'] }}</span>
-                    <span>{{ $item['value'] }} · {{ $percentual }}%</span>
-                </div>
-                <div class="metric-bar">
-                    <span class="{{ $item['class'] }}" style="--value: {{ max($item['value'] > 0 ? 5 : 0, $percentual) }}%"></span>
-                </div>
-            </div>
-        @endforeach
-    </div>
-</section>
+<div class="dashboard-overview mb-6">
+    <article class="overview-card overview-card-primary">
+        <span class="overview-icon bg-info-background text-info">
+            <i data-lucide="activity" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Saúde do ciclo</p>
+            <strong>{{ $taxaConclusao }}%</strong>
+            <span>{{ $cards['Avaliações concluídas'] }} de {{ $totalCiclo }} concluídas</span>
+        </div>
+    </article>
+
+    <article class="overview-card {{ $cards['Avaliações pendentes'] > 0 ? 'overview-card-warning' : '' }}">
+        <span class="overview-icon bg-warning-background text-warning">
+            <i data-lucide="mail-warning" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Pendentes</p>
+            <strong>{{ $cards['Avaliações pendentes'] }}</strong>
+            <span>aguardando gestores</span>
+        </div>
+    </article>
+
+    <article class="overview-card {{ $atrasadas->count() > 0 ? 'overview-card-danger' : '' }}">
+        <span class="overview-icon bg-danger-background text-danger">
+            <i data-lucide="alarm-clock" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Atrasadas</p>
+            <strong>{{ $atrasadas->count() }}</strong>
+            <span>precisam de ação</span>
+        </div>
+    </article>
+
+    <article class="overview-card">
+        <span class="overview-icon bg-surface-active text-info">
+            <i data-lucide="calendar-clock" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Agendadas</p>
+            <strong>{{ $cards['Avaliações agendadas'] }}</strong>
+            <span>ciclos futuros</span>
+        </div>
+    </article>
+</div>
 
 <section class="app-card mb-6 p-5" aria-labelledby="atencao-heading">
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2">
             <span class="metric-icon bg-danger-background text-danger">
                 <i data-lucide="mail-warning" class="size-4" aria-hidden="true"></i>
@@ -79,13 +103,6 @@
         @endforelse
     </div>
 </section>
-
-<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    <x-stat-card label="Pendentes" :value="$cards['Avaliações pendentes']" icon="mail-warning" tone="warning" hint="aguardando resposta" />
-    <x-stat-card label="Concluídas" :value="$cards['Avaliações concluídas']" icon="badge-check" tone="success" :hint="$taxaConclusao . '% do ciclo'" />
-    <x-stat-card label="Agendadas" :value="$cards['Avaliações agendadas']" icon="calendar-clock" hint="ciclos programados" />
-    <x-stat-card label="Gestores" :value="$cards['Gestores']" icon="user-check" hint="responsáveis cadastrados" />
-</div>
 
 <div class="mt-6 grid gap-6 lg:grid-cols-2">
     <section class="app-card p-5">

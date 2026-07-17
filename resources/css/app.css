@@ -1042,41 +1042,68 @@ input.evaluation-input {
     background: var(--color-primary);
 }
 
-.executive-hero {
+.dashboard-overview {
     display: grid;
-    gap: 1.5rem;
-    align-items: center;
-    border: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
-    border-radius: var(--radius-lg);
-    background:
-        linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 10%, var(--color-surface)), var(--color-surface)),
-        var(--color-surface);
-    box-shadow: var(--shadow-sm);
-    padding: 1.5rem;
+    gap: 1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.executive-hero h3 {
-    margin-top: .45rem;
+.overview-card {
+    display: flex;
+    gap: .9rem;
+    align-items: flex-start;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-xs);
+    min-height: 8.25rem;
+    padding: 1.15rem 1.2rem;
+}
+
+.overview-card-primary {
+    border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-info-background) 72%, var(--color-surface)), var(--color-surface));
+}
+
+.overview-card-warning {
+    border-color: color-mix(in srgb, var(--color-warning) 35%, var(--color-border));
+    background: linear-gradient(135deg, var(--color-warning-background), var(--color-surface));
+}
+
+.overview-card-danger {
+    border-color: color-mix(in srgb, var(--color-danger) 35%, var(--color-border));
+    background: linear-gradient(135deg, var(--color-danger-background), var(--color-surface));
+}
+
+.overview-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: var(--radius-md);
+}
+
+.overview-card strong {
+    display: block;
+    margin-top: .55rem;
     color: var(--color-foreground);
-    font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+    font-size: 2rem;
     font-weight: 800;
     line-height: 1;
 }
 
-.executive-hero p:not(.metric-label) {
+.overview-card span:not(.overview-icon) {
+    display: block;
     margin-top: .55rem;
     color: var(--color-foreground-muted);
-    font-size: .95rem;
+    font-size: .82rem;
+    line-height: 1.35;
 }
 
-.status-stack {
-    display: grid;
-    gap: .85rem;
-}
-
-@media (min-width: 768px) {
-    .executive-hero {
-        grid-template-columns: minmax(0, .9fr) minmax(22rem, 1fr);
+@media (max-width: 1100px) {
+    .dashboard-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
