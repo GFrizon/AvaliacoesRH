@@ -8,6 +8,7 @@ use App\Models\Avaliacao;
 use App\Models\Colaborador;
 use App\Models\Setor;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -67,6 +68,18 @@ class DashboardController extends Controller
                 ->limit(6)
                 ->get(),
             'setores' => Setor::withCount('colaboradores')->where('empresa_id', $empresaId)->get(),
+            'porUnidade' => Colaborador::query()
+                ->select('unidade_negocio', DB::raw('count(*) as total'))
+                ->where('empresa_id', $empresaId)
+                ->where('is_active', true)
+                ->groupBy('unidade_negocio')
+                ->orderByDesc('total')
+                ->get(),
+            'porStatus' => Avaliacao::query()
+                ->select('status', DB::raw('count(*) as total'))
+                ->where('empresa_id', $empresaId)
+                ->groupBy('status')
+                ->pluck('total', 'status'),
         ]);
     }
 }

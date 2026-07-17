@@ -1042,6 +1042,44 @@ input.evaluation-input {
     background: var(--color-primary);
 }
 
+.executive-hero {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 18%, var(--color-border));
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 10%, var(--color-surface)), var(--color-surface)),
+        var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
+}
+
+.executive-hero h3 {
+    margin-top: .45rem;
+    color: var(--color-foreground);
+    font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+    font-weight: 800;
+    line-height: 1;
+}
+
+.executive-hero p:not(.metric-label) {
+    margin-top: .55rem;
+    color: var(--color-foreground-muted);
+    font-size: .95rem;
+}
+
+.status-stack {
+    display: grid;
+    gap: .85rem;
+}
+
+@media (min-width: 768px) {
+    .executive-hero {
+        grid-template-columns: minmax(0, .9fr) minmax(22rem, 1fr);
+    }
+}
+
 @media (prefers-reduced-motion: no-preference) {
     .metric-bar span {
         transition: width var(--duration-slow) var(--ease-standard);

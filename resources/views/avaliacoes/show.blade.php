@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="evaluation-hero mb-6">
@@ -6,17 +6,17 @@
         <div>
             <p class="page-kicker">Avaliação de desempenho</p>
             <h2 class="page-title mt-2">{{ $avaliacao->colaborador->nome }}</h2>
-            <p class="mt-2 text-foreground-muted">{{ $avaliacao->colaborador->cargo }} - {{ $avaliacao->colaborador->setor->nome }}</p>
+            <p class="mt-2 text-foreground-muted">{{ $avaliacao->colaborador->cargo }} · {{ $avaliacao->colaborador->setor->nome }} · {{ $avaliacao->colaborador->unidade_negocio }}</p>
             <div class="mt-4 flex flex-wrap gap-2 text-sm">
-                <span class="rounded-full bg-sky-50 px-3 py-1 font-semibold text-sky-700">{{ $avaliacao->ciclo->label() }}</span>
-                <span class="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-600">{{ $avaliacao->formulario->tipo->label() }}</span>
+                <span class="status-pill status-info">{{ $avaliacao->ciclo->label() }}</span>
+                <span class="status-pill status-neutral">{{ $avaliacao->formulario->tipo->label() }}</span>
+                <span class="status-pill {{ $avaliacao->dias_restantes < 0 ? 'status-danger' : 'status-warning' }}">Prazo: {{ $avaliacao->data_limite->format('d/m/Y') }}</span>
             </div>
         </div>
         <div class="evaluation-meta md:text-right">
             <span>Admissão: {{ optional($avaliacao->colaborador->data_admissao)->format('d/m/Y') ?? 'Não informado' }}</span>
             <span>Responsável: {{ $avaliacao->gestor->name }}</span>
             <span>Formulário: {{ $avaliacao->formulario->nome }}</span>
-            <span>Prazo: {{ $avaliacao->data_limite->format('d/m/Y') }}</span>
             @if (auth()->user()->isRh() && in_array($avaliacao->status->value, ['agendada', 'pendente', 'concluida'], true))
                 <form method="post" action="{{ route('avaliacoes.reenviar-email', $avaliacao) }}" class="mt-3">
                     @csrf
@@ -36,7 +36,7 @@
         @csrf
         <div class="evaluation-progress">
             <div class="mb-3 flex justify-between text-sm">
-                <span>Progresso</span>
+                <span>Progresso da resposta</span>
                 <span x-text="`${answered}/${total}`"></span>
             </div>
             <div class="progress-track">
@@ -82,7 +82,8 @@
 
         <section class="question-card question-card-final">
             <label class="block">
-                <span class="question-title">Observacoes finais</span>
+                <span class="question-title">Observações finais</span>
+                <span class="question-description">Registre pontos importantes para o RH acompanhar depois da avaliação.</span>
                 <textarea name="observacoes_finais" rows="3" class="evaluation-input"></textarea>
             </label>
             <div class="mt-5">
@@ -99,21 +100,21 @@
         </div>
     </form>
 @else
-    <section class="app-card rounded-2xl p-5">
+    <section class="app-card p-5">
         <div class="flex flex-col justify-between gap-4 md:flex-row md:items-start">
             <div>
-                <h3 class="font-semibold">Resultado da avaliação</h3>
-                <p class="mt-2 text-sm text-zinc-400">Status: {{ $avaliacao->status->label() }}</p>
+                <h3 class="section-title">Resultado da avaliação</h3>
+                <p class="mt-2 text-sm text-foreground-muted">Status: {{ $avaliacao->status->label() }}</p>
             </div>
             @if (! is_null($avaliacao->efetivar))
-                <span class="h-fit rounded-full px-3 py-1 text-sm {{ $avaliacao->efetivar ? 'bg-green-500/10 text-green-300' : 'bg-red-500/10 text-red-300' }}">
+                <span class="status-pill {{ $avaliacao->efetivar ? 'status-success' : 'status-danger' }}">
                     {{ $avaliacao->efetivar ? 'Efetivar' : 'Não efetivar' }}
                 </span>
             @endif
         </div>
 
         @if ($avaliacao->status->value === 'cancelada')
-            <div class="mt-5 rounded-lg border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            <div class="mt-5 rounded-lg border border-danger bg-danger-background px-4 py-3 text-sm text-danger">
                 {{ $avaliacao->motivo_cancelamento ?: 'Avaliação cancelada.' }}
             </div>
         @endif
@@ -121,23 +122,22 @@
         <div class="mt-6 space-y-4">
             @forelse ($avaliacao->formulario->perguntas as $pergunta)
                 @php($resposta = $avaliacao->respostas->firstWhere('pergunta_id', $pergunta->id))
-                <article class="rounded-lg border border-white/10 bg-zinc-950/60 p-4">
-                    <p class="font-medium">{{ $pergunta->titulo }}</p>
+                <article class="rounded-lg border border-border bg-background p-4">
+                    <p class="font-medium text-foreground">{{ $pergunta->titulo }}</p>
                     @if ($pergunta->descricao)
-                        <p class="mt-1 text-sm text-zinc-500">{{ $pergunta->descricao }}</p>
+                        <p class="mt-1 text-sm text-foreground-muted">{{ $pergunta->descricao }}</p>
                     @endif
-                    <p class="mt-3 whitespace-pre-line text-sm text-zinc-300">{{ data_get($resposta?->valor, 'value') ?: 'Sem resposta.' }}</p>
+                    <p class="mt-3 whitespace-pre-line text-sm text-foreground-muted">{{ data_get($resposta?->valor, 'value') ?: 'Sem resposta.' }}</p>
                 </article>
             @empty
-                <p class="text-sm text-zinc-400">Este formulário não possui perguntas.</p>
+                <p class="text-sm text-foreground-muted">Este formulário não possui perguntas.</p>
             @endforelse
         </div>
 
-        <div class="mt-6 rounded-lg border border-white/10 bg-zinc-950/60 p-4">
-            <p class="font-medium">Observacoes finais</p>
-            <p class="mt-2 whitespace-pre-line text-sm text-zinc-300">{{ $avaliacao->observacoes_finais ?: 'Sem observações finais.' }}</p>
+        <div class="mt-6 rounded-lg border border-border bg-background p-4">
+            <p class="font-medium text-foreground">Observações finais</p>
+            <p class="mt-2 whitespace-pre-line text-sm text-foreground-muted">{{ $avaliacao->observacoes_finais ?: 'Sem observações finais.' }}</p>
         </div>
     </section>
 @endif
 @endsection
-

@@ -31,8 +31,35 @@ class AvaliacaoController extends Controller
             $query->where('empresa_id', $request->user()->empresa_id);
         }
 
+        $empresaId = $request->user()->empresa_id;
+
+        $query
+            ->when($request->filled('busca'), function ($query) use ($request): void {
+                $busca = $request->string('busca')->toString();
+
+                $query->whereHas('colaborador', function ($query) use ($busca): void {
+                    $query->where('nome', 'like', "%{$busca}%")
+                        ->orWhere('cpf', 'like', "%{$busca}%")
+                        ->orWhere('cargo', 'like', "%{$busca}%");
+                });
+            })
+            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->toString()))
+            ->when($request->filled('gestor_id'), fn ($query) => $query->where('gestor_id', $request->integer('gestor_id')))
+            ->when($request->filled('ciclo'), fn ($query) => $query->where('ciclo', $request->string('ciclo')->toString()))
+            ->when($request->filled('unidade_negocio'), function ($query) use ($request): void {
+                $query->whereHas('colaborador', fn ($query) => $query->where('unidade_negocio', $request->string('unidade_negocio')->toString()));
+            });
+
         return view('avaliacoes.index', [
-            'avaliacoes' => $query->latest()->paginate(12),
+            'avaliacoes' => $query->latest()->paginate(12)->withQueryString(),
+            'gestores' => User::where('empresa_id', $empresaId)
+                ->where('role', UserRole::Gestor)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(),
+            'unidadesNegocio' => UnidadesNegocio::options($empresaId),
+            'ciclos' => AvaliacaoCiclo::cases(),
+            'statusOptions' => AvaliacaoStatus::cases(),
         ]);
     }
 

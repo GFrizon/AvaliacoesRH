@@ -12,9 +12,55 @@
     </x-slot:actions>
 </x-page-header>
 
+<form class="filter-card mb-6 grid gap-3 lg:grid-cols-[1.3fr_repeat(4,minmax(0,1fr))_auto]">
+    <input name="busca" value="{{ request('busca') }}" placeholder="Buscar colaborador, CPF ou cargo" class="app-input min-h-10 px-3 text-sm">
+
+    <select name="status" class="app-input min-h-10 px-3 text-sm">
+        <option value="">Todos os status</option>
+        @foreach ($statusOptions as $status)
+            <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
+        @endforeach
+    </select>
+
+    @if (auth()->user()->isRh())
+        <select name="gestor_id" class="app-input min-h-10 px-3 text-sm">
+            <option value="">Todos os gestores</option>
+            @foreach ($gestores as $gestor)
+                <option value="{{ $gestor->id }}" @selected((string) request('gestor_id') === (string) $gestor->id)>{{ $gestor->name }}</option>
+            @endforeach
+        </select>
+    @endif
+
+    <select name="unidade_negocio" class="app-input min-h-10 px-3 text-sm">
+        <option value="">Todas as unidades</option>
+        @foreach ($unidadesNegocio as $unidade)
+            <option value="{{ $unidade }}" @selected(request('unidade_negocio') === $unidade)>{{ $unidade }}</option>
+        @endforeach
+    </select>
+
+    <select name="ciclo" class="app-input min-h-10 px-3 text-sm">
+        <option value="">Todos os ciclos</option>
+        @foreach ($ciclos as $ciclo)
+            <option value="{{ $ciclo->value }}" @selected(request('ciclo') === $ciclo->value)>{{ $ciclo->label() }}</option>
+        @endforeach
+    </select>
+
+    <div class="flex gap-2">
+        <button class="btn-primary px-3">
+            <i data-lucide="filter" class="size-4"></i>
+            Filtrar
+        </button>
+        @if (request()->hasAny(['busca', 'status', 'gestor_id', 'unidade_negocio', 'ciclo']))
+            <a href="{{ route('avaliacoes.index') }}" class="btn-secondary px-3" title="Limpar filtros">
+                <i data-lucide="x" class="size-4"></i>
+            </a>
+        @endif
+    </div>
+</form>
+
 <div class="desktop-table table-shell">
     <table class="w-full text-left text-sm">
-        <thead class="bg-white/5 text-zinc-400">
+        <thead>
             <tr>
                 <th class="px-4 py-3">Colaborador</th>
                 <th class="px-4 py-3">Gestor</th>
@@ -25,20 +71,20 @@
                 <th class="px-4 py-3"></th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-white/10">
-            @foreach ($avaliacoes as $avaliacao)
+        <tbody class="divide-y divide-border">
+            @forelse ($avaliacoes as $avaliacao)
                 @php
                     $statusClasses = match ($avaliacao->status->value) {
                         'agendada' => 'status-neutral',
                         'concluida' => 'status-success',
                         'cancelada' => 'status-danger',
-                        default => 'status-info',
+                        default => $avaliacao->dias_restantes < 0 ? 'status-danger' : 'status-info',
                     };
                 @endphp
                 <tr>
                     <td class="px-4 py-4">
                         <p class="table-title">{{ $avaliacao->colaborador->nome }}</p>
-                        <p class="table-subtitle">{{ $avaliacao->colaborador->cargo }}</p>
+                        <p class="table-subtitle">{{ $avaliacao->colaborador->cargo }} · {{ $avaliacao->colaborador->unidade_negocio }}</p>
                     </td>
                     <td class="px-4 py-4 table-text">{{ $avaliacao->gestor->name }}</td>
                     <td class="px-4 py-4 table-text">
@@ -65,7 +111,14 @@
                         </div>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" class="px-4 py-12 text-center">
+                        <p class="font-semibold text-foreground">Nenhuma avaliação encontrada</p>
+                        <p class="mt-1 text-sm text-foreground-muted">Ajuste os filtros ou crie uma nova avaliação.</p>
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
@@ -77,7 +130,7 @@
                 'agendada' => 'status-neutral',
                 'concluida' => 'status-success',
                 'cancelada' => 'status-danger',
-                default => 'status-info',
+                default => $avaliacao->dias_restantes < 0 ? 'status-danger' : 'status-info',
             };
         @endphp
         <article class="mobile-card p-4">
@@ -90,6 +143,7 @@
             </div>
             <div class="mt-4 space-y-3">
                 <div class="mobile-field"><span>Gestor</span><span>{{ $avaliacao->gestor->name }}</span></div>
+                <div class="mobile-field"><span>Unidade</span><span>{{ $avaliacao->colaborador->unidade_negocio }}</span></div>
                 <div class="mobile-field"><span>Modelo</span><span>{{ $avaliacao->formulario->tipo->label() }}</span></div>
                 <div class="mobile-field"><span>Ciclo</span><span>{{ $avaliacao->ciclo->label() }}</span></div>
                 <div class="mobile-field"><span>Prazo</span><span>{{ $avaliacao->data_limite->format('d/m/Y') }}</span></div>
@@ -108,7 +162,10 @@
             </div>
         </article>
     @empty
-        <div class="mobile-card p-6 text-center text-sm text-slate-400">Nenhuma avaliação encontrada.</div>
+        <div class="mobile-card p-6 text-center">
+            <p class="font-semibold text-foreground">Nenhuma avaliação encontrada</p>
+            <p class="mt-1 text-sm text-foreground-muted">Ajuste os filtros para ver outros ciclos.</p>
+        </div>
     @endforelse
 </div>
 
