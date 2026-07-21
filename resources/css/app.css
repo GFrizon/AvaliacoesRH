@@ -1306,6 +1306,19 @@ input.evaluation-input {
     box-shadow: var(--shadow-xs);
     min-height: 8.25rem;
     padding: 1.15rem 1.2rem;
+    text-decoration: none;
+    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+a.overview-card:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+a.overview-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 .overview-card-primary {

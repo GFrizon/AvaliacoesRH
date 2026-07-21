@@ -334,4 +334,58 @@ class AvaliacaoControllerTest extends TestCase
             ->assertRedirect(route('avaliacoes.index'))
             ->assertSessionHas('status', 'Essa avaliação não está vinculada ao seu usuário.');
     }
+
+    public function test_gestor_can_filter_overdue_evaluations(): void
+    {
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'Administrativo']);
+        $gestor = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Gestor,
+        ]);
+        $formulario = Formulario::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Avaliacao ADM',
+            'tipo' => FormularioTipo::Administrativo,
+        ]);
+        $colaboradorAtrasado = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Colaborador Atrasado',
+            'cargo' => 'Analista',
+        ]);
+        $colaboradorFuturo = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Colaborador Futuro',
+            'cargo' => 'Analista',
+        ]);
+
+        Avaliacao::create([
+            'empresa_id' => $empresa->id,
+            'colaborador_id' => $colaboradorAtrasado->id,
+            'gestor_id' => $gestor->id,
+            'formulario_id' => $formulario->id,
+            'ciclo' => AvaliacaoCiclo::NoventaDias,
+            'status' => AvaliacaoStatus::Agendada,
+            'data_limite' => now()->subDay(),
+        ]);
+        Avaliacao::create([
+            'empresa_id' => $empresa->id,
+            'colaborador_id' => $colaboradorFuturo->id,
+            'gestor_id' => $gestor->id,
+            'formulario_id' => $formulario->id,
+            'ciclo' => AvaliacaoCiclo::NoventaDias,
+            'status' => AvaliacaoStatus::Agendada,
+            'data_limite' => now()->addDay(),
+        ]);
+
+        $this->actingAs($gestor)
+            ->get(route('avaliacoes.index', ['prazo' => 'atrasadas']))
+            ->assertOk()
+            ->assertSee('Colaborador Atrasado')
+            ->assertDontSee('Colaborador Futuro');
+    }
 }

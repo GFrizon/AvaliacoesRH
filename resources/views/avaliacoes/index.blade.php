@@ -50,7 +50,7 @@
 
     <div class="flex gap-2">
         <noscript><button class="btn-primary px-3">Filtrar</button></noscript>
-        @if (request()->hasAny(['busca', 'status', 'gestor_id', 'unidade_negocio', 'ciclo']))
+        @if (request()->hasAny(['busca', 'status', 'prazo', 'gestor_id', 'unidade_negocio', 'ciclo']))
             <a href="{{ route('avaliacoes.index') }}" class="btn-secondary px-3" title="Limpar filtros">
                 <i data-lucide="x" class="size-4"></i>
                 Limpar

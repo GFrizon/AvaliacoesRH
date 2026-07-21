@@ -44,6 +44,16 @@ class AvaliacaoController extends Controller
                 });
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')->toString()))
+            ->when($request->string('prazo')->toString() === 'atrasadas', function ($query): void {
+                $query
+                    ->whereIn('status', [AvaliacaoStatus::Agendada->value, AvaliacaoStatus::Pendente->value])
+                    ->whereDate('data_limite', '<', now()->toDateString());
+            })
+            ->when($request->string('prazo')->toString() === 'hoje', function ($query): void {
+                $query
+                    ->whereIn('status', [AvaliacaoStatus::Agendada->value, AvaliacaoStatus::Pendente->value])
+                    ->whereDate('data_limite', now()->toDateString());
+            })
             ->when($request->filled('gestor_id'), fn ($query) => $query->where('gestor_id', $request->integer('gestor_id')))
             ->when($request->filled('ciclo'), fn ($query) => $query->where('ciclo', $request->string('ciclo')->toString()))
             ->when($request->filled('unidade_negocio'), function ($query) use ($request): void {
