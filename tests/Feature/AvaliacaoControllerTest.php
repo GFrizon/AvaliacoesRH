@@ -218,6 +218,67 @@ class AvaliacaoControllerTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_gestor_can_answer_scheduled_evaluation_when_opening_it(): void
+    {
+        Mail::fake();
+
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'Administrativo']);
+        $gestor = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Gestor,
+        ]);
+        $colaborador = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Gabriel Teste',
+            'cargo' => 'Analista',
+        ]);
+        $formulario = Formulario::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Avaliação ADM',
+            'tipo' => FormularioTipo::Administrativo,
+        ]);
+        $pergunta = Pergunta::create([
+            'formulario_id' => $formulario->id,
+            'titulo' => 'Pontualidade',
+            'tipo' => PerguntaTipo::TextoLongo,
+            'ordem' => 1,
+        ]);
+        $avaliacao = Avaliacao::create([
+            'empresa_id' => $empresa->id,
+            'colaborador_id' => $colaborador->id,
+            'gestor_id' => $gestor->id,
+            'formulario_id' => $formulario->id,
+            'ciclo' => AvaliacaoCiclo::NoventaDias,
+            'status' => AvaliacaoStatus::Agendada,
+            'data_limite' => now()->addMonths(3),
+        ]);
+
+        $this->actingAs($gestor)
+            ->get(route('avaliacoes.show', $avaliacao))
+            ->assertOk()
+            ->assertSee('Enviar avalia');
+
+        $this->assertSame(AvaliacaoStatus::Pendente, $avaliacao->refresh()->status);
+        $this->assertNotNull($avaliacao->iniciada_em);
+
+        $this->actingAs($gestor)
+            ->post(route('avaliacoes.submit', $avaliacao), [
+                'respostas' => [$pergunta->id => 'Tudo certo.'],
+                'observacoes_finais' => 'Sem observacoes.',
+                'efetivar' => '1',
+            ])
+            ->assertRedirect(route('avaliacoes.index'));
+
+        $this->assertSame(AvaliacaoStatus::Concluida, $avaliacao->refresh()->status);
+        $this->assertDatabaseHas('respostas', [
+            'avaliacao_id' => $avaliacao->id,
+            'pergunta_id' => $pergunta->id,
+        ]);
+    }
+
     public function test_gestor_opening_wrong_evaluation_is_redirected_to_index(): void
     {
         $empresa = Empresa::create(['nome' => 'Empresa Demo']);

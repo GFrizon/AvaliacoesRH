@@ -228,8 +228,15 @@ class AvaliacaoController extends Controller
 
         $avaliacao->load(['colaborador.setor', 'gestor', 'formulario.perguntas', 'respostas']);
 
-        if ($avaliacao->status === AvaliacaoStatus::Pendente && $request->user()->isGestor() && ! $avaliacao->iniciada_em) {
-            $avaliacao->update(['iniciada_em' => now()]);
+        if (
+            in_array($avaliacao->status, [AvaliacaoStatus::Agendada, AvaliacaoStatus::Pendente], true)
+            && $request->user()->isGestor()
+            && ! $avaliacao->iniciada_em
+        ) {
+            $avaliacao->update([
+                'status' => AvaliacaoStatus::Pendente,
+                'iniciada_em' => now(),
+            ]);
         }
 
         return view('avaliacoes.show', compact('avaliacao'));
@@ -239,7 +246,7 @@ class AvaliacaoController extends Controller
     {
         $this->authorizeAccess($request, $avaliacao);
         abort_unless($request->user()->isGestor(), 403);
-        abort_unless($avaliacao->status === AvaliacaoStatus::Pendente, 422);
+        abort_unless(in_array($avaliacao->status, [AvaliacaoStatus::Agendada, AvaliacaoStatus::Pendente], true), 422);
 
         $perguntas = $avaliacao->formulario->perguntas->where('is_active', true);
         $validated = $request->validate([

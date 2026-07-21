@@ -30,7 +30,7 @@
     </div>
 </div>
 
-@if (auth()->user()->isGestor() && $avaliacao->status->value === 'pendente')
+@if (auth()->user()->isGestor() && in_array($avaliacao->status->value, ['agendada', 'pendente'], true))
     @php($perguntasAtivas = $avaliacao->formulario->perguntas->where('is_active', true))
     <form method="post" action="{{ route('avaliacoes.submit', $avaliacao) }}" class="evaluation-form" x-data="{ answered: 0, total: {{ $perguntasAtivas->count() }}, update() { this.answered = new Set([...$el.querySelectorAll('[data-answer]')].filter((field) => field.type === 'radio' ? field.checked : field.value.trim() !== '').map((field) => field.name)).size } }">
         @csrf
