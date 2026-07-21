@@ -67,9 +67,13 @@ class AvaliacaoWorkflowService
             }
         }
 
-        $this->recalcularPrazosAbertos($colaborador);
+        $reagendadas = $this->recalcularPrazosAbertos($colaborador);
 
         $this->notificarGestorAvaliacoesAgendadas($colaborador, $criadas);
+
+        if ($criadas->isEmpty()) {
+            $this->notificarGestorAvaliacoesReagendadas($colaborador, $reagendadas);
+        }
     }
 
     public function notificarGestorAvaliacoesAgendadas(Colaborador $colaborador, Collection $avaliacoes): bool
@@ -87,6 +91,24 @@ class AvaliacaoWorkflowService
             $colaborador->gestor->email,
             "Avaliações agendadas: {$colaborador->nome}",
             new AvaliacoesAgendadasMail($colaborador, $avaliacoes),
+        );
+    }
+
+    public function notificarGestorAvaliacoesReagendadas(Colaborador $colaborador, Collection $avaliacoes): bool
+    {
+        $colaborador->loadMissing(['gestor', 'setor']);
+
+        if ($avaliacoes->isEmpty() || ! $colaborador->gestor?->email) {
+            return false;
+        }
+
+        return $this->enviarEmail(
+            $colaborador->empresa_id,
+            $avaliacoes->first()?->id,
+            'avaliacoes_reagendadas',
+            $colaborador->gestor->email,
+            "Datas de avaliacoes atualizadas: {$colaborador->nome}",
+            new AvaliacoesAgendadasMail($colaborador, $avaliacoes, reagendada: true),
         );
     }
 
@@ -232,19 +254,39 @@ class AvaliacaoWorkflowService
         };
     }
 
-    private function recalcularPrazosAbertos(Colaborador $colaborador): void
+    private function recalcularPrazosAbertos(Colaborador $colaborador): Collection
     {
+        $reagendadas = new Collection();
+
         Avaliacao::query()
             ->where('colaborador_id', $colaborador->id)
             ->where('formulario_id', $colaborador->formulario_id)
             ->whereIn('status', [AvaliacaoStatus::Agendada->value, AvaliacaoStatus::Pendente->value])
             ->whereDoesntHave('respostas')
             ->get()
-            ->each(function (Avaliacao $avaliacao) use ($colaborador): void {
+            ->each(function (Avaliacao $avaliacao) use ($colaborador, $reagendadas): void {
+                $dataLimite = $this->dataLimite($colaborador, $avaliacao->ciclo);
+
+                if ($avaliacao->data_limite?->toDateString() === $dataLimite->toDateString()) {
+                    return;
+                }
+
+                $status = $dataLimite->isFuture()
+                    ? AvaliacaoStatus::Agendada
+                    : AvaliacaoStatus::Pendente;
+
                 $avaliacao->update([
-                    'data_limite' => $this->dataLimite($colaborador, $avaliacao->ciclo),
+                    'status' => $status,
+                    'data_limite' => $dataLimite,
+                    'notificado_em' => $status === AvaliacaoStatus::Agendada ? null : $avaliacao->notificado_em,
+                    'ultimo_lembrete_em' => $status === AvaliacaoStatus::Agendada ? null : $avaliacao->ultimo_lembrete_em,
+                    'lembretes_enviados' => $status === AvaliacaoStatus::Agendada ? 0 : $avaliacao->lembretes_enviados,
                 ]);
+
+                $reagendadas->push($avaliacao->fresh(['formulario']));
             });
+
+        return $reagendadas;
     }
 
     private function enviarEmail(int $empresaId, ?int $avaliacaoId, string $tipo, string $destinatario, string $assunto, Mailable $mail): bool

@@ -163,8 +163,18 @@ class ColaboradorControllerTest extends TestCase
             ])
             ->assertRedirect(route('colaboradores.index'));
 
-        $this->assertSame('2026-10-30', Avaliacao::where('ciclo', AvaliacaoCiclo::NoventaDias)->first()->refresh()->data_limite->toDateString());
+        $noventaDias = Avaliacao::where('ciclo', AvaliacaoCiclo::NoventaDias)->first()->refresh();
+
+        $this->assertSame('2026-10-30', $noventaDias->data_limite->toDateString());
+        $this->assertSame(AvaliacaoStatus::Agendada, $noventaDias->status);
         $this->assertSame('2027-02-01', Avaliacao::where('ciclo', AvaliacaoCiclo::SeisMeses)->first()->refresh()->data_limite->toDateString());
         $this->assertSame('2027-08-01', Avaliacao::where('ciclo', AvaliacaoCiclo::UmAno)->first()->refresh()->data_limite->toDateString());
+
+        Mail::assertSent(AvaliacoesAgendadasMail::class, fn ($mail) => $mail->hasTo($gestor->email) && $mail->reagendada);
+        $this->assertDatabaseHas('email_logs', [
+            'destinatario' => $gestor->email,
+            'tipo' => 'avaliacoes_reagendadas',
+            'status' => 'enviado',
+        ]);
     }
 }

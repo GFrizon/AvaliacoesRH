@@ -17,6 +17,7 @@ class AvaliacoesAgendadasMail extends Mailable
     public function __construct(
         public Colaborador $colaborador,
         public Collection $avaliacoes,
+        public bool $reagendada = false,
     ) {
         $this->colaborador->loadMissing(['gestor', 'setor']);
         $this->avaliacoes->loadMissing(['formulario']);
@@ -24,8 +25,10 @@ class AvaliacoesAgendadasMail extends Mailable
 
     public function envelope(): Envelope
     {
+        $prefixo = $this->reagendada ? 'Datas de avaliacoes atualizadas' : 'Avaliacoes agendadas';
+
         return new Envelope(
-            subject: "Avaliações agendadas: {$this->colaborador->nome}",
+            subject: "{$prefixo}: {$this->colaborador->nome}",
         );
     }
 
