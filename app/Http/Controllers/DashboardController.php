@@ -26,11 +26,31 @@ class DashboardController extends Controller
                 ->orderBy('data_limite')
                 ->get();
 
+            $agendadas = Avaliacao::query()
+                ->with(['colaborador.setor', 'formulario'])
+                ->where('gestor_id', $user->id)
+                ->where('status', AvaliacaoStatus::Agendada)
+                ->orderBy('data_limite')
+                ->get();
+
+            $concluidasRecentes = Avaliacao::query()
+                ->with(['colaborador.setor', 'formulario'])
+                ->where('gestor_id', $user->id)
+                ->where('status', AvaliacaoStatus::Concluida)
+                ->latest('concluida_em')
+                ->limit(5)
+                ->get();
+
+            $abertas = $pendentes->concat($agendadas);
+
             return view('dashboards.gestor', [
                 'pendentes' => $pendentes,
+                'agendadas' => $agendadas,
+                'proximasAgendadas' => $agendadas->take(6),
+                'concluidasRecentes' => $concluidasRecentes,
                 'concluidasCount' => Avaliacao::where('gestor_id', $user->id)->where('status', AvaliacaoStatus::Concluida)->count(),
-                'atrasadasCount' => $pendentes->where('dias_restantes', '<', 0)->count(),
-                'venceHojeCount' => $pendentes->where('dias_restantes', 0)->count(),
+                'atrasadasCount' => $abertas->where('dias_restantes', '<', 0)->count(),
+                'venceHojeCount' => $abertas->where('dias_restantes', 0)->count(),
             ]);
         }
 

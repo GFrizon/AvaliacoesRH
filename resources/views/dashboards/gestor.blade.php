@@ -4,37 +4,68 @@
 @php
     $primeiroNome = strtok(auth()->user()->name, ' ');
     $prazoLabel = function ($dias) {
-        if ($dias < 0) return 'Atrasada há ' . abs($dias) . ' dia' . (abs($dias) === 1 ? '' : 's');
+        if ($dias < 0) return 'Atrasada ha ' . abs($dias) . ' dia' . (abs($dias) === 1 ? '' : 's');
         if ($dias === 0) return 'Vence hoje';
-        if ($dias === 1) return 'Vence amanhã';
+        if ($dias === 1) return 'Vence amanha';
         return 'Vence em ' . $dias . ' dias';
     };
 @endphp
 
 <x-page-header
     eyebrow="Bom dia, {{ $primeiroNome }}"
-    title="Suas avaliações"
-    description="Responda os ciclos liberados pelo RH dentro do prazo."
+    title="Suas avaliacoes"
+    description="Acompanhe o que precisa de resposta agora e os ciclos que ja estao programados."
 />
 
-<div class="grid gap-4 md:grid-cols-3">
-    <article class="dashboard-signal {{ $atrasadasCount > 0 ? 'dashboard-signal-danger' : '' }}">
-        <p class="metric-label">Atrasadas</p>
-        <p class="metric-value">{{ $atrasadasCount }}</p>
+<div class="dashboard-overview mb-6">
+    <article class="overview-card {{ $pendentes->count() > 0 ? 'overview-card-warning' : '' }}">
+        <span class="overview-icon bg-warning-background text-warning">
+            <i data-lucide="clipboard-pen" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Pendentes</p>
+            <strong>{{ $pendentes->count() }}</strong>
+            <span>liberadas para resposta</span>
+        </div>
     </article>
-    <article class="dashboard-signal {{ $venceHojeCount > 0 ? 'dashboard-signal-warning' : '' }}">
-        <p class="metric-label">Vencem hoje</p>
-        <p class="metric-value">{{ $venceHojeCount }}</p>
+
+    <article class="overview-card {{ $atrasadasCount > 0 ? 'overview-card-danger' : '' }}">
+        <span class="overview-icon bg-danger-background text-danger">
+            <i data-lucide="mail-warning" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Atrasadas</p>
+            <strong>{{ $atrasadasCount }}</strong>
+            <span>precisam de atencao</span>
+        </div>
     </article>
-    <article class="dashboard-signal">
-        <p class="metric-label">Concluídas</p>
-        <p class="metric-value">{{ $concluidasCount }}</p>
+
+    <article class="overview-card">
+        <span class="overview-icon bg-surface-active text-info">
+            <i data-lucide="calendar-clock" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Agendadas</p>
+            <strong>{{ $agendadas->count() }}</strong>
+            <span>ciclos futuros</span>
+        </div>
+    </article>
+
+    <article class="overview-card overview-card-success">
+        <span class="overview-icon bg-success-background text-success">
+            <i data-lucide="badge-check" class="size-5" aria-hidden="true"></i>
+        </span>
+        <div>
+            <p class="metric-label">Concluidas</p>
+            <strong>{{ $concluidasCount }}</strong>
+            <span>{{ $venceHojeCount }} vencendo hoje</span>
+        </div>
     </article>
 </div>
 
 <div class="mt-6 flex items-center justify-between gap-4">
     <div>
-        <h3 class="section-title">Pendentes</h3>
+        <h3 class="section-title">Responder agora</h3>
         <p class="card-description mt-1">Priorizadas por data limite.</p>
     </div>
     <span class="status-pill status-info">{{ $pendentes->count() }} pendente{{ $pendentes->count() === 1 ? '' : 's' }}</span>
@@ -69,8 +100,62 @@
     @empty
         <section class="app-card p-6 lg:col-span-2">
             <h3 class="card-title">Tudo em dia</h3>
-            <p class="card-description">Você não possui avaliações pendentes no momento.</p>
+            <p class="card-description">Voce nao possui avaliacoes pendentes no momento.</p>
         </section>
     @endforelse
+</div>
+
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+    <section class="app-card p-5">
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <div>
+                <h3 class="section-title">Agendadas</h3>
+                <p class="card-description mt-1">Ciclos programados pelo RH.</p>
+            </div>
+            <span class="status-pill status-neutral">{{ $agendadas->count() }}</span>
+        </div>
+
+        <div class="divide-y divide-border">
+            @forelse ($proximasAgendadas as $avaliacao)
+                @php
+                    $dias = $avaliacao->dias_restantes;
+                    $badgeState = $dias < 0 ? 'status-danger' : ($dias <= 1 ? 'status-warning' : 'status-info');
+                @endphp
+                <a href="{{ route('avaliacoes.show', $avaliacao) }}" class="flex items-center justify-between gap-4 py-3 text-sm transition-colors hover:bg-surface-hover">
+                    <div class="min-w-0">
+                        <p class="truncate font-medium text-foreground">{{ $avaliacao->colaborador->nome }}</p>
+                        <p class="truncate text-foreground-muted">{{ $avaliacao->ciclo->label() }} - {{ $avaliacao->formulario->tipo->label() }}</p>
+                    </div>
+                    <span class="status-pill shrink-0 {{ $badgeState }}">{{ $prazoLabel($dias) }}</span>
+                </a>
+            @empty
+                <p class="py-6 text-sm text-foreground-muted">Nenhuma avaliacao agendada para voce.</p>
+            @endforelse
+        </div>
+    </section>
+
+    <section class="app-card p-5">
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <div>
+                <h3 class="section-title">Concluidas recentes</h3>
+                <p class="card-description mt-1">Ultimas respostas enviadas.</p>
+            </div>
+            <span class="status-pill status-success">{{ $concluidasCount }}</span>
+        </div>
+
+        <div class="divide-y divide-border">
+            @forelse ($concluidasRecentes as $avaliacao)
+                <a href="{{ route('avaliacoes.show', $avaliacao) }}" class="flex items-center justify-between gap-4 py-3 text-sm transition-colors hover:bg-surface-hover">
+                    <div class="min-w-0">
+                        <p class="truncate font-medium text-foreground">{{ $avaliacao->colaborador->nome }}</p>
+                        <p class="truncate text-foreground-muted">{{ $avaliacao->ciclo->label() }} - {{ optional($avaliacao->concluida_em)->format('d/m/Y') }}</p>
+                    </div>
+                    <span class="status-pill shrink-0 {{ $avaliacao->efetivar ? 'status-success' : 'status-neutral' }}">{{ $avaliacao->efetivar ? 'Efetivar' : 'Nao efetivar' }}</span>
+                </a>
+            @empty
+                <p class="py-6 text-sm text-foreground-muted">Nenhuma avaliacao concluida ainda.</p>
+            @endforelse
+        </div>
+    </section>
 </div>
 @endsection
