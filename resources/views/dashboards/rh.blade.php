@@ -26,7 +26,7 @@
 </x-page-header>
 
 <div class="dashboard-overview mb-6">
-    <article class="overview-card overview-card-success">
+    <a href="{{ route('avaliacoes.index', ['status' => 'concluida']) }}" class="overview-card overview-card-success">
         <span class="overview-icon bg-success-background text-success">
             <i data-lucide="badge-check" class="size-5" aria-hidden="true"></i>
         </span>
@@ -35,9 +35,9 @@
             <strong>{{ $cards['Avaliações concluídas'] }}</strong>
             <span>{{ $taxaConclusao }}% do ciclo concluído</span>
         </div>
-    </article>
+    </a>
 
-    <article class="overview-card {{ $cards['Avaliações pendentes'] > 0 ? 'overview-card-warning' : '' }}">
+    <a href="{{ route('avaliacoes.index', ['status' => 'pendente']) }}" class="overview-card {{ $cards['Avaliações pendentes'] > 0 ? 'overview-card-warning' : '' }}">
         <span class="overview-icon bg-warning-background text-warning">
             <i data-lucide="mail-warning" class="size-5" aria-hidden="true"></i>
         </span>
@@ -46,9 +46,9 @@
             <strong>{{ $cards['Avaliações pendentes'] }}</strong>
             <span>aguardando gestores</span>
         </div>
-    </article>
+    </a>
 
-    <article class="overview-card {{ $atrasadas->count() > 0 ? 'overview-card-danger' : '' }}">
+    <a href="{{ route('avaliacoes.index', ['prazo' => 'atrasadas']) }}" class="overview-card {{ $atrasadas->count() > 0 ? 'overview-card-danger' : '' }}">
         <span class="overview-icon bg-danger-background text-danger">
             <i data-lucide="mail-warning" class="size-5" aria-hidden="true"></i>
         </span>
@@ -57,9 +57,9 @@
             <strong>{{ $atrasadas->count() }}</strong>
             <span>precisam de ação</span>
         </div>
-    </article>
+    </a>
 
-    <article class="overview-card">
+    <a href="{{ route('avaliacoes.index', ['status' => 'agendada']) }}" class="overview-card">
         <span class="overview-icon bg-surface-active text-info">
             <i data-lucide="calendar-clock" class="size-5" aria-hidden="true"></i>
         </span>
@@ -68,7 +68,7 @@
             <strong>{{ $cards['Avaliações agendadas'] }}</strong>
             <span>ciclos futuros</span>
         </div>
-    </article>
+    </a>
 </div>
 
 <section class="app-card mb-6 p-5" aria-labelledby="atencao-heading">

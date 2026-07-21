@@ -19,6 +19,23 @@ class DashboardControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_rh_dashboard_cards_link_to_filtered_evaluations(): void
+    {
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $rh = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Rh,
+        ]);
+
+        $this->actingAs($rh)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee(route('avaliacoes.index', ['status' => 'concluida']), false)
+            ->assertSee(route('avaliacoes.index', ['status' => 'pendente']), false)
+            ->assertSee(route('avaliacoes.index', ['status' => 'agendada']), false)
+            ->assertSee(route('avaliacoes.index', ['prazo' => 'atrasadas']), false);
+    }
+
     public function test_gestor_dashboard_shows_scheduled_and_pending_evaluations(): void
     {
         $empresa = Empresa::create(['nome' => 'Empresa Demo']);
