@@ -67,6 +67,8 @@ class AvaliacaoWorkflowService
             }
         }
 
+        $this->recalcularPrazosAbertos($colaborador);
+
         $this->notificarGestorAvaliacoesAgendadas($colaborador, $criadas);
     }
 
@@ -228,6 +230,21 @@ class AvaliacaoWorkflowService
             AvaliacaoCiclo::SeisMeses => $base->addMonths(6),
             AvaliacaoCiclo::UmAno => $base->addYear(),
         };
+    }
+
+    private function recalcularPrazosAbertos(Colaborador $colaborador): void
+    {
+        Avaliacao::query()
+            ->where('colaborador_id', $colaborador->id)
+            ->where('formulario_id', $colaborador->formulario_id)
+            ->whereIn('status', [AvaliacaoStatus::Agendada->value, AvaliacaoStatus::Pendente->value])
+            ->whereDoesntHave('respostas')
+            ->get()
+            ->each(function (Avaliacao $avaliacao) use ($colaborador): void {
+                $avaliacao->update([
+                    'data_limite' => $this->dataLimite($colaborador, $avaliacao->ciclo),
+                ]);
+            });
     }
 
     private function enviarEmail(int $empresaId, ?int $avaliacaoId, string $tipo, string $destinatario, string $assunto, Mailable $mail): bool
