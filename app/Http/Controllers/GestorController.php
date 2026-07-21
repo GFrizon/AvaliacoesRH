@@ -38,18 +38,16 @@ class GestorController extends Controller
         $existingUser = User::where('email', $email)->first();
 
         if ($existingUser) {
-            if (
-                (int) $existingUser->empresa_id === (int) $empresaId
-                && $existingUser->role === UserRole::Gestor
-                && ! $existingUser->is_active
-            ) {
+            if ((int) $existingUser->empresa_id === (int) $empresaId && ! $existingUser->is($request->user())) {
                 $existingUser->update([
                     ...$data,
+                    'empresa_id' => $empresaId,
                     'email' => $email,
+                    'role' => UserRole::Gestor,
                     'is_active' => $request->boolean('is_active', true),
                 ]);
 
-                return redirect()->route('gestores.index')->with('status', 'Gestor reativado com sucesso.');
+                return redirect()->route('gestores.index')->with('status', 'Gestor cadastrado com sucesso.');
             }
 
             return back()

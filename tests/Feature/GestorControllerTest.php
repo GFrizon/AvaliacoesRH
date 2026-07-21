@@ -36,7 +36,7 @@ class GestorControllerTest extends TestCase
                 'is_active' => '1',
             ])
             ->assertRedirect(route('gestores.index'))
-            ->assertSessionHas('status', 'Gestor reativado com sucesso.');
+            ->assertSessionHas('status', 'Gestor cadastrado com sucesso.');
 
         $this->assertDatabaseCount('users', 2);
         $this->assertDatabaseHas('users', [
@@ -50,15 +50,54 @@ class GestorControllerTest extends TestCase
         ]);
     }
 
-    public function test_rh_sees_friendly_error_when_email_belongs_to_another_user(): void
+    public function test_rh_can_convert_same_company_user_to_gestor_when_creating_with_same_email(): void
     {
         $empresa = Empresa::create(['nome' => 'Empresa Demo']);
         $rh = User::factory()->create([
             'empresa_id' => $empresa->id,
             'role' => UserRole::Rh,
         ]);
-        User::factory()->create([
+        $usuario = User::factory()->create([
             'empresa_id' => $empresa->id,
+            'name' => 'Usuario Antigo',
+            'email' => 'ti@bakof.com.br',
+            'role' => UserRole::Rh,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($rh)
+            ->post(route('gestores.store'), [
+                'name' => 'TI',
+                'email' => 'ti@bakof.com.br',
+                'phone' => '(55) 3744-9999',
+                'password' => 'secret123',
+                'is_active' => '1',
+            ])
+            ->assertRedirect(route('gestores.index'))
+            ->assertSessionHas('status', 'Gestor cadastrado com sucesso.');
+
+        $this->assertDatabaseCount('users', 2);
+        $this->assertDatabaseHas('users', [
+            'id' => $usuario->id,
+            'empresa_id' => $empresa->id,
+            'name' => 'TI',
+            'email' => 'ti@bakof.com.br',
+            'role' => UserRole::Gestor->value,
+            'phone' => '(55) 3744-9999',
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_rh_sees_friendly_error_when_email_belongs_to_another_company(): void
+    {
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $outraEmpresa = Empresa::create(['nome' => 'Outra Empresa']);
+        $rh = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Rh,
+        ]);
+        User::factory()->create([
+            'empresa_id' => $outraEmpresa->id,
             'email' => 'ti@bakof.com.br',
             'role' => UserRole::Rh,
             'is_active' => true,
