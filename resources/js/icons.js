@@ -7,6 +7,7 @@ import CalendarClock from 'lucide/dist/esm/icons/calendar-clock.mjs';
 import ChartNoAxesColumnIncreasing from 'lucide/dist/esm/icons/chart-no-axes-column-increasing.mjs';
 import ChevronDown from 'lucide/dist/esm/icons/chevron-down.mjs';
 import ClipboardCheck from 'lucide/dist/esm/icons/clipboard-check.mjs';
+import ClipboardPen from 'lucide/dist/esm/icons/clipboard-pen.mjs';
 import ClipboardPlus from 'lucide/dist/esm/icons/clipboard-plus.mjs';
 import Clock3 from 'lucide/dist/esm/icons/clock-3.mjs';
 import Download from 'lucide/dist/esm/icons/download.mjs';
@@ -44,6 +45,7 @@ const icons = {
     CalendarClock,
     ChevronDown,
     ClipboardCheck,
+    ClipboardPen,
     ClipboardPlus,
     Clock3,
     Download,
