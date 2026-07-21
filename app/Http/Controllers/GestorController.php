@@ -31,8 +31,35 @@ class GestorController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $data = $this->validated($request);
+        $email = $request->string('email')->lower()->toString();
+        $empresaId = $request->user()->empresa_id;
+
+        $existingUser = User::where('email', $email)->first();
+
+        if ($existingUser) {
+            if (
+                (int) $existingUser->empresa_id === (int) $empresaId
+                && $existingUser->role === UserRole::Gestor
+                && ! $existingUser->is_active
+            ) {
+                $existingUser->update([
+                    ...$data,
+                    'email' => $email,
+                    'is_active' => $request->boolean('is_active', true),
+                ]);
+
+                return redirect()->route('gestores.index')->with('status', 'Gestor reativado com sucesso.');
+            }
+
+            return back()
+                ->withErrors(['email' => 'Este e-mail ja esta em uso por outro usuario.'])
+                ->withInput($request->except('password'));
+        }
+
         User::create([
-            ...$this->validated($request),
+            ...$data,
+            'email' => $email,
             'empresa_id' => $request->user()->empresa_id,
             'role' => UserRole::Gestor,
             'is_active' => $request->boolean('is_active', true),
@@ -83,7 +110,7 @@ class GestorController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($gestor),
+                ...($gestor ? [Rule::unique('users', 'email')->ignore($gestor)] : []),
             ],
             'phone' => ['nullable', 'string', 'max:30'],
             'password' => [$gestor ? 'nullable' : 'required', 'string', 'min:6'],
