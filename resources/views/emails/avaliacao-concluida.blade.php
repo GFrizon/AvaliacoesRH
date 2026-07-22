@@ -49,6 +49,13 @@
                                 </tr>
                             </table>
 
+                            @if ($avaliacao->observacoes_finais)
+                                <div style="margin:0 0 24px;padding:18px 20px;background:#f8fafc;border:1px solid #e5edf6;border-radius:12px;">
+                                    <p style="margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#61708a;font-weight:700;">Observacoes do gestor</p>
+                                    <p style="margin:0;font-size:15px;line-height:1.6;color:#172033;white-space:pre-line;">{{ $avaliacao->observacoes_finais }}</p>
+                                </div>
+                            @endif
+
                             <a href="{{ $url }}" style="display:inline-block;background:#4736d4;color:#ffffff;padding:13px 18px;border-radius:10px;text-decoration:none;font-weight:700;">
                                 Ver resultado completo
                             </a>

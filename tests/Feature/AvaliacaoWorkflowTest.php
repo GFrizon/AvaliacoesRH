@@ -136,6 +136,7 @@ class AvaliacaoWorkflowTest extends TestCase
 
         $this->assertSame(AvaliacaoStatus::Concluida, $avaliacao->refresh()->status);
         Mail::assertSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rh->email));
+        Mail::assertSent(AvaliacaoConcluidaMail::class, fn ($mail) => str_contains($mail->render(), 'Colaborador apto para seguir.'));
         Mail::assertSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($outroRh->email));
         Mail::assertNotSent(AvaliacaoConcluidaMail::class, fn ($mail) => $mail->hasTo($rhInativo->email));
         $this->assertDatabaseHas('email_logs', [
