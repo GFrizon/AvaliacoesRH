@@ -23,7 +23,8 @@ class AvaliacaoController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Avaliacao::with(['colaborador.setor', 'gestor', 'formulario']);
+        $query = Avaliacao::with(['colaborador.setor', 'gestor', 'formulario'])
+            ->comColaboradorAtivo();
 
         if ($request->user()->isGestor()) {
             $query->where('gestor_id', $request->user()->id);

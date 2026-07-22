@@ -50,6 +50,24 @@ class AvaliacaoWorkflowTest extends TestCase
         ]);
     }
 
+    public function test_command_ignores_due_evaluations_from_inactive_colaboradores(): void
+    {
+        Mail::fake();
+
+        [$avaliacao, $gestor, $pergunta, $colaborador] = $this->makeAvaliacao([
+            'status' => AvaliacaoStatus::Agendada,
+            'data_limite' => now()->subDay(),
+        ]);
+        $colaborador->update(['is_active' => false]);
+
+        $this->artisan('avaliacoes:enviar-pendentes')
+            ->expectsOutput('E-mails enviados: 0')
+            ->assertSuccessful();
+
+        Mail::assertNothingSent();
+        $this->assertSame(AvaliacaoStatus::Agendada, $avaliacao->refresh()->status);
+    }
+
     public function test_not_effective_result_cancels_future_evaluations(): void
     {
         Mail::fake();

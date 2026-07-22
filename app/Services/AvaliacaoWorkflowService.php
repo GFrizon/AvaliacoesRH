@@ -118,6 +118,7 @@ class AvaliacaoWorkflowService
 
         Avaliacao::query()
             ->with(['colaborador', 'gestor', 'formulario'])
+            ->comColaboradorAtivo()
             ->where('status', AvaliacaoStatus::Agendada->value)
             ->whereDate('data_limite', '<=', now()->toDateString())
             ->whereNull('notificado_em')
@@ -129,6 +130,7 @@ class AvaliacaoWorkflowService
 
         Avaliacao::query()
             ->with(['colaborador', 'gestor', 'formulario'])
+            ->comColaboradorAtivo()
             ->where('status', AvaliacaoStatus::Pendente->value)
             ->whereDate('data_limite', '<=', now()->toDateString())
             ->where(function ($query): void {

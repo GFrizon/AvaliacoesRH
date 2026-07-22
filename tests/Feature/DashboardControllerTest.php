@@ -96,4 +96,53 @@ class DashboardControllerTest extends TestCase
             ->assertSee('Teste GABRIEL')
             ->assertSee('Ana Pendente');
     }
+
+    public function test_dashboard_ignores_evaluations_from_inactive_colaboradores(): void
+    {
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'TI']);
+        $rh = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Rh,
+        ]);
+        $gestor = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Gestor,
+        ]);
+        $colaborador = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Colaborador Oculto',
+            'cargo' => 'Analista',
+            'is_active' => false,
+        ]);
+        $formulario = Formulario::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Formulario Comercial',
+            'tipo' => FormularioTipo::ComercialEngenharia,
+        ]);
+
+        Avaliacao::create([
+            'empresa_id' => $empresa->id,
+            'colaborador_id' => $colaborador->id,
+            'gestor_id' => $gestor->id,
+            'formulario_id' => $formulario->id,
+            'ciclo' => AvaliacaoCiclo::NoventaDias,
+            'status' => AvaliacaoStatus::Pendente,
+            'data_limite' => now(),
+        ]);
+
+        $this->actingAs($rh)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('>0<', false)
+            ->assertDontSee('Colaborador Oculto');
+
+        $this->actingAs($gestor)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('>0<', false)
+            ->assertDontSee('Colaborador Oculto');
+    }
 }

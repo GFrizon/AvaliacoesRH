@@ -21,6 +21,7 @@ class DashboardController extends Controller
         if ($user->role === UserRole::Gestor) {
             $pendentes = Avaliacao::query()
                 ->with(['colaborador.setor', 'formulario'])
+                ->comColaboradorAtivo()
                 ->where('gestor_id', $user->id)
                 ->where('status', AvaliacaoStatus::Pendente)
                 ->orderBy('data_limite')
@@ -28,6 +29,7 @@ class DashboardController extends Controller
 
             $agendadas = Avaliacao::query()
                 ->with(['colaborador.setor', 'formulario'])
+                ->comColaboradorAtivo()
                 ->where('gestor_id', $user->id)
                 ->where('status', AvaliacaoStatus::Agendada)
                 ->orderBy('data_limite')
@@ -35,6 +37,7 @@ class DashboardController extends Controller
 
             $concluidasRecentes = Avaliacao::query()
                 ->with(['colaborador.setor', 'formulario'])
+                ->comColaboradorAtivo()
                 ->where('gestor_id', $user->id)
                 ->where('status', AvaliacaoStatus::Concluida)
                 ->latest('concluida_em')
@@ -48,7 +51,7 @@ class DashboardController extends Controller
                 'agendadas' => $agendadas,
                 'proximasAgendadas' => $agendadas->take(6),
                 'concluidasRecentes' => $concluidasRecentes,
-                'concluidasCount' => Avaliacao::where('gestor_id', $user->id)->where('status', AvaliacaoStatus::Concluida)->count(),
+                'concluidasCount' => Avaliacao::comColaboradorAtivo()->where('gestor_id', $user->id)->where('status', AvaliacaoStatus::Concluida)->count(),
                 'atrasadasCount' => $abertas->where('dias_restantes', '<', 0)->count(),
                 'venceHojeCount' => $abertas->where('dias_restantes', 0)->count(),
             ]);
@@ -58,22 +61,24 @@ class DashboardController extends Controller
 
         return view('dashboards.rh', [
             'cards' => [
-                'Avaliações agendadas' => Avaliacao::where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Agendada)->count(),
-                'Avaliações pendentes' => Avaliacao::where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Pendente)->count(),
-                'Avaliações concluídas' => Avaliacao::where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Concluida)->count(),
-                'Avaliações canceladas' => Avaliacao::where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Cancelada)->count(),
+                'Avaliações agendadas' => Avaliacao::comColaboradorAtivo()->where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Agendada)->count(),
+                'Avaliações pendentes' => Avaliacao::comColaboradorAtivo()->where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Pendente)->count(),
+                'Avaliações concluídas' => Avaliacao::comColaboradorAtivo()->where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Concluida)->count(),
+                'Avaliações canceladas' => Avaliacao::comColaboradorAtivo()->where('empresa_id', $empresaId)->where('status', AvaliacaoStatus::Cancelada)->count(),
                 'Gestores' => User::where('empresa_id', $empresaId)->where('role', UserRole::Gestor)->count(),
                 'Colaboradores' => Colaborador::where('empresa_id', $empresaId)->count(),
-                'Efetivados' => Avaliacao::where('empresa_id', $empresaId)->where('efetivar', true)->count(),
-                'Não efetivados' => Avaliacao::where('empresa_id', $empresaId)->where('efetivar', false)->count(),
+                'Efetivados' => Avaliacao::comColaboradorAtivo()->where('empresa_id', $empresaId)->where('efetivar', true)->count(),
+                'Não efetivados' => Avaliacao::comColaboradorAtivo()->where('empresa_id', $empresaId)->where('efetivar', false)->count(),
             ],
             'ultimas' => Avaliacao::with(['colaborador', 'gestor'])
+                ->comColaboradorAtivo()
                 ->where('empresa_id', $empresaId)
                 ->where('status', AvaliacaoStatus::Concluida)
                 ->latest('concluida_em')
                 ->limit(6)
                 ->get(),
             'atrasadas' => Avaliacao::with(['colaborador', 'gestor', 'formulario'])
+                ->comColaboradorAtivo()
                 ->where('empresa_id', $empresaId)
                 ->where('status', AvaliacaoStatus::Pendente)
                 ->whereDate('data_limite', '<', now()->toDateString())
@@ -81,6 +86,7 @@ class DashboardController extends Controller
                 ->limit(6)
                 ->get(),
             'proximas' => Avaliacao::with(['colaborador', 'gestor', 'formulario'])
+                ->comColaboradorAtivo()
                 ->where('empresa_id', $empresaId)
                 ->where('status', AvaliacaoStatus::Agendada)
                 ->whereDate('data_limite', '<=', now()->addDays(15)->toDateString())
@@ -97,6 +103,7 @@ class DashboardController extends Controller
                 ->get(),
             'porStatus' => Avaliacao::query()
                 ->select('status', DB::raw('count(*) as total'))
+                ->comColaboradorAtivo()
                 ->where('empresa_id', $empresaId)
                 ->groupBy('status')
                 ->pluck('total', 'status'),

@@ -388,4 +388,63 @@ class AvaliacaoControllerTest extends TestCase
             ->assertSee('Colaborador Atrasado')
             ->assertDontSee('Colaborador Futuro');
     }
+
+    public function test_inactive_colaborador_evaluations_are_hidden_from_index(): void
+    {
+        $empresa = Empresa::create(['nome' => 'Empresa Demo']);
+        $setor = Setor::create(['empresa_id' => $empresa->id, 'nome' => 'Administrativo']);
+        $rh = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Rh,
+        ]);
+        $gestor = User::factory()->create([
+            'empresa_id' => $empresa->id,
+            'role' => UserRole::Gestor,
+        ]);
+        $formulario = Formulario::create([
+            'empresa_id' => $empresa->id,
+            'nome' => 'Avaliacao ADM',
+            'tipo' => FormularioTipo::Administrativo,
+        ]);
+        $colaboradorAtivo = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Colaborador Ativo',
+            'cargo' => 'Analista',
+            'is_active' => true,
+        ]);
+        $colaboradorInativo = Colaborador::create([
+            'empresa_id' => $empresa->id,
+            'setor_id' => $setor->id,
+            'gestor_id' => $gestor->id,
+            'nome' => 'Colaborador Inativo',
+            'cargo' => 'Analista',
+            'is_active' => false,
+        ]);
+
+        foreach ([$colaboradorAtivo, $colaboradorInativo] as $colaborador) {
+            Avaliacao::create([
+                'empresa_id' => $empresa->id,
+                'colaborador_id' => $colaborador->id,
+                'gestor_id' => $gestor->id,
+                'formulario_id' => $formulario->id,
+                'ciclo' => AvaliacaoCiclo::NoventaDias,
+                'status' => AvaliacaoStatus::Pendente,
+                'data_limite' => now(),
+            ]);
+        }
+
+        $this->actingAs($rh)
+            ->get(route('avaliacoes.index'))
+            ->assertOk()
+            ->assertSee('Colaborador Ativo')
+            ->assertDontSee('Colaborador Inativo');
+
+        $this->actingAs($gestor)
+            ->get(route('avaliacoes.index'))
+            ->assertOk()
+            ->assertSee('Colaborador Ativo')
+            ->assertDontSee('Colaborador Inativo');
+    }
 }

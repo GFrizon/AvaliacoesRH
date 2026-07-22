@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AvaliacaoCiclo;
 use App\Enums\AvaliacaoStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -68,6 +69,11 @@ class Avaliacao extends Model
     public function respostas(): HasMany
     {
         return $this->hasMany(Resposta::class);
+    }
+
+    public function scopeComColaboradorAtivo(Builder $query): Builder
+    {
+        return $query->whereHas('colaborador', fn (Builder $query) => $query->where('is_active', true));
     }
 
     public function getDiasRestantesAttribute(): int
